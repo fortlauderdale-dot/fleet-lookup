@@ -122,14 +122,14 @@
   .ck2{display:inline-block;font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 6px;margin-right:6px}
   :root{--s1:#257de0;--s2:#f47230;--s3:#00b894;--s4:#f2a600;--s5:#ee7fac;--s6:#008a17;--s7:#6a4ce2;--s8:#ec4647;--good:#0aac23;--warn:#fbb315;--serious:#f18a59;--crit:#dc3c3d;--track:#eef1f4}
   @media (prefers-color-scheme: dark){:root{--s1:#338ced;--s2:#e76624;--s3:#00a888;--s4:#d28e05;--s5:#e24d8b;--s6:#0aac23;--s7:#9887ef;--s8:#eb6263;--track:#223140}}
-  .dhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}.dhead h1{margin:0;font-size:20px}.dhead .note{margin-left:auto;padding:0}
-  .dsec{margin:18px 0 8px;font-size:14px;font-weight:650;color:var(--muted)}
+  .dhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:-8px 0 2px}.dhead h1{margin:0;font-size:18px}.dhead .note{margin-left:auto;padding:0}
+  .dsec{margin:10px 0 6px;font-size:14px;font-weight:650;color:var(--muted)}
   .dtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
   .dt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
   .dt .dn{font-size:26px;font-weight:650;line-height:1.1}.dt .dl{font-size:12px;color:var(--ink);margin-top:2px}.dt .ds{font-size:11px;color:var(--muted)}
   .dt.alert{border-color:var(--crit)}.dt.alert .dn{color:var(--crit)}
   .clk{cursor:pointer}.dt.clk:hover,.hr:hover,.cc:hover{background:var(--accent-soft)}.cc{border-radius:4px}.dt.clk:hover{border-color:var(--accent)}
-  .dgrid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}
+  .dgrid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:10px}
   .dgrid .wide{grid-column:1/-1}
   @media (max-width:900px){.dgrid{grid-template-columns:1fr}}
   @media (min-width:1700px){.dgrid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-flow:dense}}
@@ -591,7 +591,7 @@
       var limit=dayStr(new Date(nowD.getTime()+365*864e5));
       if(key<today){ov.c+=v.projCost;ov.n++}else{var y=key.slice(0,4);(byY[y]=byY[y]||{c:0,n:0});byY[y].c+=v.projCost;byY[y].n++;if(key<=limit){nx.c+=v.projCost;nx.n++}}});
     var ycats=[{l:'Overdue',t:'Overdue',x:cnt(ov.n)+' vehicles'}],yo=[ov.c],ys=[0],ycnt=[ov.n];
-    Object.keys(byY).sort().forEach(function(y){if(+y>yr+6)return;ycats.push({l:y,t:y,x:cnt(byY[y].n)+' vehicles'});yo.push(0);ys.push(byY[y].c);ycnt.push(byY[y].n)});
+    for(var yy=yr;yy<yr+10;yy++){var k=String(yy),b=byY[k]||{c:0,n:0};ycats.push({l:k,t:k,x:cnt(b.n)+' vehicles'});yo.push(0);ys.push(b.c);ycnt.push(b.n)}
     var ovGo=goV('vehicles past their projected replacement date',function(v){if(/^Retired/.test(v.status)||!v.projDate||!v.projCost)return false;return v.projDate.slice(6)+'-'+v.projDate.slice(0,2)+'-'+v.projDate.slice(3,5)<today});
 
     /* needs attention */
@@ -652,12 +652,12 @@
       '<div class="dsec">The Fleet</div>'+
       '<div class="dgrid">'+
         card('Vehicles by status','',hbars(fstItems))+
+        card('Replacement outlook','',
+          '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
+          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}))+
         card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
         card('Active vehicles by category','',hbars(catItems))+
         card('Active vehicles by department','',hbars(dpItems))+
-        card('Replacement outlook','',
-          '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
-          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}),'wide')+
       '</div>'+
       '';
     document.getElementById('dper').onchange=function(){dper=this.value;renderDash()};
