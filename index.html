@@ -134,7 +134,7 @@
   @media (max-width:900px){.dgrid{grid-template-columns:1fr}}
   @media (min-width:1700px){.dgrid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-flow:dense}}
   .dcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px 14px;min-width:0}
-  .dcard h3{margin:0 0 10px;font-size:14px;font-weight:650}.dcard h3 span{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+  .dcard h3{margin:0 0 10px;font-size:14px;font-weight:650;display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}.dcard h3 span{font-weight:400;font-size:12px;color:var(--muted)}
   .hb{display:flex;flex-direction:column;gap:5px}
   .hr{display:grid;grid-template-columns:minmax(110px,190px) 1fr auto;gap:10px;align-items:center;padding:2px 4px;border-radius:6px}
   .hl{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -145,7 +145,7 @@
   .gl{position:absolute;left:-46px;right:0;border-top:1px solid var(--line);height:0}
   .gl span{position:absolute;left:0;top:-8px;width:40px;text-align:right;font-size:11px;color:var(--muted);background:var(--panel)}
   .avgl{position:absolute;left:0;right:0;height:0;border-top:2px dashed var(--ink);opacity:.55;pointer-events:none}
-  .dcard{display:flex;flex-direction:column}.dcard .hb{flex:1;justify-content:space-around}.dcard .ch{margin-top:auto}
+  .dcard{display:flex;flex-direction:column}.dcard .hb{flex:1;justify-content:space-around}.dcard .ch{flex:1;display:flex;flex-direction:column}.dcard .ch .pa{flex:1}
   .cr,.cl{display:grid}
   .cr{position:absolute;inset:0}
   .cc{height:100%;display:flex;align-items:flex-end;justify-content:center}
@@ -489,7 +489,7 @@
     }).join('');
     var lbl=cats.map(function(c,i){return '<div class="cx" data-tip="'+esc(tips[i])+'">'+esc(c.l)+'</div>'}).join('');
     var lg=series.length>1||o.legend?'<div class="lg">'+series.map(function(s){return '<span><i style="background:'+s.c+'"></i>'+esc(s.n)+'</span>'}).join('')+'</div>':'';
-    return '<div class="ch"><div class="pa" style="height:'+(o.h||170)+'px">'+grid+'<div class="cr" style="'+tpl+'">'+cs+'</div>'+(o.avg?'<div class="avgl" style="bottom:'+(o.avg/top*100)+'%"></div>':'')+'</div><div class="cl" style="'+tpl+'">'+lbl+'</div></div>'+lg;
+    return '<div class="ch"><div class="pa" style="min-height:'+(o.h||170)+'px">'+grid+'<div class="cr" style="'+tpl+'">'+cs+'</div>'+(o.avg?'<div class="avgl" style="bottom:'+(o.avg/top*100)+'%"></div>':'')+'</div><div class="cl" style="'+tpl+'">'+lbl+'</div></div>'+lg;
   }
 
   function renderDash(){
@@ -638,9 +638,9 @@
       '<div class="dgrid">'+
         card('Open work orders by status','',hbars(stItems))+
         card('How long open work orders have been open','',hbars(agItems))+
-        card('Maintenance cost by month and shop','Average '+cm(avgCost)+' per month',cols(months,mser,{fmt:cm,go:mgo,h:190,avg:avgCost,tipCol:function(i){return wotip(opened[i],costTot[i])},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
-        card('Work orders opened per month','Average '+cnt(Math.round(avgOpened))+' per month',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo,avg:avgOpened}))+
-        card('Road calls per month','Average '+cnt(Math.round(avgRoads))+' per month',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo,avg:avgRoads}))+
+        card('Maintenance cost by month and shop','Average '+cm(avgCost)+'/month',cols(months,mser,{fmt:cm,go:mgo,h:190,avg:avgCost,tipCol:function(i){return wotip(opened[i],costTot[i])},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
+        card('Work orders opened per month','Average '+cnt(Math.round(avgOpened))+'/month',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo,avg:avgOpened}))+
+        card('Road calls per month','Average '+cnt(Math.round(avgRoads))+'/month',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo,avg:avgRoads}))+
         card('What the work orders are for','',hbars(thItems))+
         card('Maintenance cost by department','',hbars(depItems))+
         card('Top 10 vehicles by maintenance cost','',hbars(topV))+
