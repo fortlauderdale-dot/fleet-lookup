@@ -634,6 +634,7 @@
     app.innerHTML=
       '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label></div>'+
       '<div class="dsec">Right Now</div><div class="dtiles">'+now+'</div>'+
+      '<div class="dgrid">'+card('Needs attention','','<div class="att">'+att+'</div>','wide')+'</div>'+
       '<div class="dsec">'+esc(tc(perName))+'</div><div class="dtiles">'+pt+'</div>'+
       '<div class="dgrid">'+
         card('Open work orders by status','',hbars(stItems))+
@@ -645,7 +646,6 @@
         card('Maintenance cost by department','',hbars(depItems))+
         card('Top 10 vehicles by maintenance cost','',hbars(topV))+
         card('Most work orders, last 90 days',ffTotal+' vehicles with 3 or more',hbars(ffItems))+
-        card('Needs attention','',  '<div class="att">'+att+'</div>','wide')+
         card('Average days down by shop','',hbars(shopItems))+
         card('Maintenance cost per active vehicle','Departments with 10 or more vehicles',hbars(depPV))+
       '</div>'+
