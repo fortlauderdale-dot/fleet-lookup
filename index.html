@@ -164,7 +164,7 @@
   <div class="brand" id="brand">Fort Lauderdale Fleet<small>Asset lookup</small></div>
   <nav class="nav"><button id="navd">Dashboard</button><button id="navv">Vehicles</button><button id="navw">Work Orders</button></nav>
   <div class="searchwrap">
-    <input id="q" type="search" autocomplete="off" placeholder="Type a vehicle number (V10060), plate, VIN, make, model, contact, notes..." aria-label="Search vehicles">
+    <input id="q" type="search" autocomplete="off" placeholder="Search" aria-label="Search vehicles">
   </div>
   
 </header>
@@ -397,7 +397,7 @@
     document.getElementById('navw').className=m==='w'?'on':'';
     if(m!==curMode){var was=curMode;curMode=m;
       if((m==='w')!==(was==='w')){q.value=m==='w'?wq:query}
-      q.placeholder=m==='w'?'Search work orders: WO #, vehicle, repair, complaint, technician, shop...':'Type a vehicle number (V10060), plate, VIN, make, model, contact, notes...'}
+      q.placeholder=m==='w'?'Search work orders':'Search'}
   }
   function render(){
     var id=decodeURIComponent(location.hash.slice(1));
