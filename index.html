@@ -459,7 +459,8 @@
   function niceStep(x){var p=Math.pow(10,Math.floor(Math.log(x||1)/Math.LN10)),r=x/p,n=r<=1?1:r<=2?2:r<=2.5?2.5:r<=5?5:10;return n*p}
 
   function dtile(label,val,sub,go,cls){return '<div class="dt'+(cls?' '+cls:'')+(go!=null?' clk':'')+'"'+(go!=null?' data-go="'+go+'" role="button"':'')+'><div class="dn">'+val+'</div><div class="dl">'+esc(label)+'</div>'+(sub?'<div class="ds">'+esc(sub)+'</div>':'')+'</div>'}
-  function card(title,sub,inner,cls){return '<section class="dcard'+(cls?' '+cls:'')+'"><h3>'+esc(title)+(sub?'<span>'+esc(sub)+'</span>':'')+'</h3>'+inner+'</section>'}
+  function tc(t){var minor={a:1,an:1,and:1,as:1,at:1,by:1,for:1,in:1,of:1,on:1,or:1,per:1,the:1,to:1};return String(t).split(' ').map(function(w,i){var l=w.toLowerCase();if(i>0&&minor[l])return l;return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ')}
+  function card(title,sub,inner,cls){return '<section class="dcard'+(cls?' '+cls:'')+'"><h3>'+esc(tc(title))+(sub?'<span>'+esc(sub)+'</span>':'')+'</h3>'+inner+'</section>'}
   function hbars(items){
     if(!items.length)return '<div class="note">Nothing to show for this period.</div>';
     var max=0;items.forEach(function(i){if(i.v>max)max=i.v});
@@ -518,9 +519,9 @@
     var now=
       dtile('Open work orders',cnt(open.length),cnt(nVeh)+' vehicles',goWO('open work orders',isOpenW,'Open'))+
       dtile('Out of Service vehicles',cnt(oos.length),oosNoWO.length+' with no open work order',goV('vehicles marked Out of Service',function(v){return v.status==='Out of Service'}),oos.length?'alert':'')+
-      dtile('Waiting on parts',cnt(waiting.length),'Awaiting parts or on order',goWO('work orders waiting on parts',function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'},'Open'))+
-      dtile('Parts available',cnt(parts.length),'Ready to schedule',goWO('work orders with parts available',function(w){return w.s==='Parts Available'},'Open'))+
-      dtile('Open over 30 days',cnt(old30.length),'Review for a stuck status',goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'),old30.length?'alert':'')+
+      dtile('Waiting on parts',cnt(waiting.length),'',goWO('work orders waiting on parts',function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'},'Open'))+
+      dtile('Parts available',cnt(parts.length),'',goWO('work orders with parts available',function(w){return w.s==='Parts Available'},'Open'))+
+      dtile('Open over 30 days',cnt(old30.length),'',goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'),old30.length?'alert':'')+
       dtile('Opened today',cnt(openToday.length),'',goWO('work orders opened today',function(w){return w.d.slice(0,10)===today}))+
       dtile('Closed today',cnt(closedToday.length),'',goWO('work orders closed today',function(w){return w.c&&w.c.slice(0,10)===today}))+
       dtile('Opened yesterday',cnt(openYest.length),'',goWO('work orders opened yesterday',function(w){return w.d.slice(0,10)===yest}));
@@ -609,7 +610,7 @@
       var rows=arr.slice(0,LIM).map(function(v){return '<tr data-v="'+esc(v.asset)+'"><td class="asset">'+esc(v.asset)+'</td><td>'+esc([v.year,v.make,v.model].filter(Boolean).join(' '))+'</td><td>'+esc(v.dept)+'</td><td>'+esc(v.division)+'</td><td>'+esc(extraFn(v))+'</td></tr>'}).join('');
       return '<div class="tablewrap static"><table><thead>'+th2(['Vehicle','Description','Department','Division',extraCol])+'</thead><tbody>'+rows+'</tbody></table></div>'+(arr.length>LIM?'<div class="amore">Showing '+LIM+' of '+cnt(arr.length)+'. <button class="btn" data-go="'+all+'">See all '+cnt(arr.length)+' in the vehicle list</button></div>':'');
     }
-    function ar(label,sub,n,panel){return '<div class="ar" data-tg="1"><div><b>'+esc(label)+'</b><span>'+esc(sub)+'</span></div><b>'+cnt(n)+'</b></div><div class="apanel">'+panel+'</div>'}
+    function ar(label,sub,n,panel){return '<div class="ar" data-tg="1"><div><b>'+esc(label)+'</b></div><b>'+cnt(n)+'</b></div><div class="apanel">'+panel+'</div>'}
     var g1=goV('Out of Service vehicles with no open work order',function(v){return !!oosSet[v.asset]});
     var g2=goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open');
     var g3=goV('in service vehicles with no work order in 12 months',function(v){return !!nwSet[v.asset]});
@@ -629,7 +630,7 @@
     app.innerHTML=
       '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label><span class="note">Click any number or bar to see the work orders or vehicles behind it.</span></div>'+
       '<div class="dsec">Right Now</div><div class="dtiles">'+now+'</div>'+
-      '<div class="dsec">'+esc(perName)+'</div><div class="dtiles">'+pt+'</div>'+
+      '<div class="dsec">'+esc(tc(perName))+'</div><div class="dtiles">'+pt+'</div>'+
       '<div class="dgrid">'+
         card('Open work orders by status','Click a status to open the list',hbars(stItems))+
         card('How long open work orders have been open','Days since opened',hbars(agItems))+
@@ -652,7 +653,7 @@
         card('Replacement outlook','Projected cost by year from the life cycle data',
           '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
           cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}),'wide')+
-        card('Needs attention','Data and status items worth a look',  '<div class="att">'+att+'</div>','wide')+
+        card('Needs attention','',  '<div class="att">'+att+'</div>','wide')+
       '</div>'+
       '<div class="note" style="margin-top:12px">Fleet equipment and non-targeted items are left out. Cost and counts use the date a work order was opened. The work order history in this export starts in late November 2025, so comparisons to earlier periods are not available yet.</div>';
     document.getElementById('dper').onchange=function(){dper=this.value;renderDash()};
