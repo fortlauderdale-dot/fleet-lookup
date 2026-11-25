@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fleet Asset Lookup</title>
 <style>
@@ -186,7 +186,7 @@
 <script>
 (function(){
   var DATA=[], BY={}, filtered=[], sortKey='asset', sortDir=1, page=0, PAGE=100;
-  var f={dept:'',division:'',status:'',supervisor:''}, query='', tab='Overview', showEmpty=false;
+  var f={dept:'',division:'',status:'',supervisor:'',tag:''}, query='', tab='Overview', showEmpty=false;
   var app=document.getElementById('app'), q=document.getElementById('q');
 
   var TABS=['Overview','Life Cycle','Scheduling','Maintenance','Part Usage','Fuel','Meter Updates','Comments/Notes','Documents','Pictures','Occupants','Recalls','Purchase Orders'];
@@ -197,7 +197,8 @@
   var subtab='Services';
   var WO=[], WOIDX={}, WOBY={}, WOLOADED=false, WOERR='', curMode='v';
   var wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false,nt:false}, wq='', wsort={k:'d',dir:-1}, wpage=0, wfiltered=[], mq='', cq='';
-  var EQN=0, NTN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false, showNT=false;
+  var TAGLIST=[], EQN=0, NTN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false, showNT=false;
+  function tagChips(v){return (v.tags||[]).map(function(t){return '<span class="chip" style="margin-right:4px">'+esc(t)+'</span>'}).join('')}
   function isEq(a){return !/^V\d+$/i.test(a||'')}
   function isNT(a){return /^z(?!\d)/i.test(a||'')}
   function hiddenAsset(a,fe,nt){return isEq(a)&&(isNT(a)?!nt:!fe)}
@@ -276,7 +277,7 @@
   var TABFN={
     'Overview':function(v){
       var hrs=v.meterType==='Engine Hours';
-      var chips=[v.hasGPS?'GPS':'',v.hasCamera?'Camera':'',v.hasCanceiver?'Canceiver':''].filter(Boolean).map(function(c){return '<span class="chip">'+c+'</span>'}).join('');
+      var chips=tagChips(v)+[v.hasGPS?'GPS':'',v.hasCamera?'Camera':'',v.hasCanceiver?'Canceiver':''].filter(Boolean).map(function(c){return '<span class="chip">'+c+'</span>'}).join('');
       return '<div class="stats">'+
           stat(hrs?'Engine hours':'Mileage',usage(v))+
           (eqShown(v)?stat('Miles equivalent',rnd(v.milesEq)+' miles'):'')+
@@ -393,10 +394,11 @@
       if(f.division&&v.division!==f.division)return false;
       if(f.status&&v.status!==f.status)return false;
       if(f.supervisor&&v.supervisor!==f.supervisor)return false;
+      if(f.tag&&(v.tags||[]).indexOf(f.tag)<0)return false;
       if(vpre&&!vpre.fn(v))return false;
       if(!toks.length&&hiddenAsset(v.asset,showEq,showNT))return false;
       if(!toks.length)return true;
-      var hay=norm([v.asset,v.year,v.make,v.model,v.dept,v.division,v.status,v.plate,v.vin,v.category,v.type,v.classCode,v.contact,v.supervisor,v.glCode,v.comments].join(' '));
+      var hay=norm([v.asset,v.year,v.make,v.model,v.dept,v.division,v.status,v.plate,v.vin,v.category,v.type,v.classCode,v.contact,v.supervisor,v.glCode,v.comments,(v.tags||[]).join(' ')].join(' '));
       return toks.every(function(t){return hay.indexOf(t)!==-1});
     });
     filtered.sort(cmp);
@@ -459,7 +461,7 @@
   function cnt(n){return Number(n).toLocaleString('en-US')}
   function reg(fn){gos.push(fn);return gos.length-1}
   function goWO(label,fn,view,srt){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,nt:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort=srt||{k:'d',dir:-1};location.hash='wo'})}
-  function goV(label,fn){return reg(function(){vpre={label:label,fn:fn};f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();location.hash=''})}
+  function goV(label,fn){return reg(function(){vpre={label:label,fn:fn};f={dept:'',division:'',status:'',supervisor:'',tag:''};query='';q.value='';page=0;applyFilters();location.hash=''})}
   function goAsset(a,t){return BY[a]?reg(function(){tab=t||'Maintenance';mq='';cq='';location.hash=encodeURIComponent(a)}):null}
   function vdesc(a){var v=BY[a];return v?[v.year,v.make,v.model].filter(Boolean).join(' '):''}
   function median(a){if(!a.length)return 0;a=a.slice().sort(function(x,y){return x-y});var m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
@@ -473,7 +475,7 @@
     var max=0;items.forEach(function(i){if(i.v>max)max=i.v});
     return '<div class="hb">'+items.map(function(i){
       var w=max?Math.max(i.v/max*100,i.v>0?1.5:0):0;
-      return '<div class="hr'+(i.go!=null?' clk':'')+'"'+(i.go!=null?' data-go="'+i.go+'"':'')+' data-tip="'+esc(i.vt+(i.t?'\n'+i.t.replace(i.l+': ',''):''))+'"><div class="hl">'+esc(i.l)+'</div><div class="ht"><div class="hf" style="width:'+w+'%;background:'+(i.c||'var(--s1)')+'"></div></div><div class="hv">'+esc(i.vt)+'</div></div>';
+      return '<div class="hr'+(i.go!=null?' clk':'')+'"'+(i.go!=null?' data-go="'+i.go+'"':'')+' data-tip="'+esc((i.tt||i.vt)+(i.t?'\n'+i.t.replace(i.l+': ',''):''))+'"><div class="hl">'+esc(i.l)+'</div><div class="ht"><div class="hf" style="width:'+w+'%;background:'+(i.c||'var(--s1)')+'"></div></div><div class="hv">'+esc(i.vt)+'</div></div>';
     }).join('')+'</div>';
   }
   function pie(items,center){
@@ -495,13 +497,14 @@
     var mx=Math.max.apply(null,tot.concat([1,o.avg||0])),step=niceStep(mx/4),top=Math.ceil(mx/step-1e-9)*step,grid='';
     for(var t=0;t<=top+1e-9;t+=step){grid+='<div class="gl" style="bottom:'+(t/top*100)+'%"><span>'+fmt(t)+'</span></div>'}
     var n=cats.length,tpl='grid-template-columns:repeat('+n+',1fr)';
-    var tips=cats.map(function(c,i){var nz=series.filter(function(x){return x.v[i]}),ls=nz.map(function(x){return x.n+': '+fmt(x.v[i])});
+    var tf=o.tfmt||fmt;
+    var tips=cats.map(function(c,i){var nz=series.filter(function(x){return x.v[i]}),ls=nz.map(function(x){return x.n+': '+tf(x.v[i])});
       if(o.tipCol)return o.tipCol(i);
-      if(series.length===1)return fmt(tot[i])+' '+series[0].n;
-      if(o.plain||nz.length<=1&&!nz.length)return fmt(tot[i])+(c.x?'\n'+c.x:'');
-      return ls.join('\n')+(nz.length>1?'\nTotal: '+fmt(tot[i]):'')});
+      if(series.length===1)return tf(tot[i])+' '+series[0].n;
+      if(o.plain||nz.length<=1&&!nz.length)return tf(tot[i])+(c.x?'\n'+c.x:'');
+      return ls.join('\n')+(nz.length>1?'\nTotal: '+tf(tot[i]):'')});
     var cs=cats.map(function(c,i){
-      var segs=series.map(function(s,si){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(o.tipSeg?o.tipSeg(i,si):series.length>1&&!o.plain?s.n+': '+fmt(v):tips[i])+'"></div>'}).join('');
+      var segs=series.map(function(s,si){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(o.tipSeg?o.tipSeg(i,si):series.length>1&&!o.plain?s.n+': '+tf(v):tips[i])+'"></div>'}).join('');
       var g=o.go&&o.go[i]!=null?o.go[i]:null;
       return '<div class="cc'+(g!=null?' clk':'')+'"'+(g!=null?' data-go="'+g+'"':'')+' data-tip="'+esc(tips[i])+'"><div class="cs">'+segs+'</div></div>';
     }).join('');
@@ -572,7 +575,7 @@
     var mser=SHOPS.map(function(n,i){return {n:n,c:SC[i],v:cost[i]}});mser.push({n:'Other',c:'var(--s7)',v:other});
     function avgFull(a){var t=0;for(var i=0;i<a.length-1;i++)t+=a[i];return t/Math.max(1,a.length-1)}
     var costTot=months.map(function(m,i){return mser.reduce(function(a,x){return a+x.v[i]},0)}),avgOpened=avgFull(opened),avgRoads=avgFull(roads),avgCost=avgFull(costTot);
-    function wotip(n,c){return cnt(n)+' work orders'+(n?'\n$'+cnt(Math.round(c/n))+' average':'')}
+    function wotip(n,c){return cnt(n)+' work orders'+(n?'\n'+money(c/n)+' average':'')}
     var mgo=months.map(function(m){return goWO('work orders opened in '+m.t,function(w){return w.d.slice(0,7)===m.k})});
     var rgo=months.map(function(m){return goWO('road calls in '+m.t,function(w){return w.rc&&w.d.slice(0,7)===m.k})});
 
@@ -581,15 +584,15 @@
     var shopItems=Object.keys(shop).map(function(k){var a=shop[k];return {l:k,v:a.reduce(function(x,y){return x+y},0)/a.length,vt:fdays(a.reduce(function(x,y){return x+y},0)/a.length)+' days · '+cnt(a.length),t:k+': median '+fdays(median(a))+' days',go:goWO(k+', closed '+perName.toLowerCase(),function(w){return (w.l||'Not listed')===k&&w.c&&w.c.slice(0,10)>=from})}}).sort(function(a,b){return b.v-a.v});
     var dep={},vc={};active.forEach(function(v){vc[v.dept]=(vc[v.dept]||0)+1});
     per.forEach(function(w){var k=BY[w.a]?BY[w.a].dept:'Not in asset list';var o=dep[k]||(dep[k]={c:0,n:0});o.c+=w.k||0;o.n++});
-    var depItems=Object.keys(dep).map(function(k){return {l:k,v:dep[k].c,vt:cm(dep[k].c),t:k+': '+cnt(dep[k].n)+' work orders',go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&(BY[w.a]?BY[w.a].dept:'Not in asset list')===k})}}).sort(function(a,b){return b.v-a.v});
+    var depItems=Object.keys(dep).map(function(k){return {l:k,v:dep[k].c,vt:cm(dep[k].c),tt:money(dep[k].c),t:k+': '+cnt(dep[k].n)+' work orders',go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&(BY[w.a]?BY[w.a].dept:'Not in asset list')===k})}}).sort(function(a,b){return b.v-a.v});
     var depPV=Object.keys(dep).filter(function(k){return vc[k]>=10}).map(function(k){var pv=dep[k].c/vc[k];return {l:k,v:pv,vt:'$'+cnt(Math.round(pv)),t:k+': '+cm(dep[k].c)+' across '+cnt(vc[k])+' active vehicles',go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&(BY[w.a]?BY[w.a].dept:'')===k})}}).sort(function(a,b){return b.v-a.v});
     var va={};per.forEach(function(w){if(!w.a)return;var o=va[w.a]||(va[w.a]={c:0,n:0});o.c+=w.k||0;o.n++});
-    var topV=Object.keys(va).filter(function(a){return BY[a]}).sort(function(a,b){return va[b].c-va[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:va[a].c,vt:cm(va[a].c),t:cnt(va[a].n)+' work orders',go:goAsset(a)}});
+    var topV=Object.keys(va).filter(function(a){return BY[a]}).sort(function(a,b){return va[b].c-va[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:va[a].c,vt:cm(va[a].c),tt:money(va[a].c),t:cnt(va[a].n)+' work orders',go:goAsset(a)}});
     var th={};per.forEach(function(w){var o=th[w._th]||(th[w._th]={n:0,c:0});o.n++;o.c+=w.k||0});
-    var thItems=Object.keys(th).sort(function(a,b){if(a==='Other')return 1;if(b==='Other')return -1;return th[b].n-th[a].n}).map(function(k){return {l:k,v:th[k].n,vt:cnt(th[k].n)+' · '+cm(th[k].c),go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&w._th===k})}});
+    var thItems=Object.keys(th).sort(function(a,b){if(a==='Other')return 1;if(b==='Other')return -1;return th[b].n-th[a].n}).map(function(k){return {l:k,v:th[k].n,vt:cnt(th[k].n)+' · '+cm(th[k].c),tt:money(th[k].c),go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&w._th===k})}});
     var cut90=dayStr(new Date(nowD.getTime()-90*864e5)),ff={};
     WOD.forEach(function(w){if(!w.a||w.d.slice(0,10)<cut90)return;var o=ff[w.a]||(ff[w.a]={n:0,c:0});o.n++;o.c+=w.k||0});
-    var ffItems=Object.keys(ff).filter(function(a){return BY[a]&&ff[a].n>=3}).sort(function(a,b){return ff[b].n-ff[a].n||ff[b].c-ff[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:ff[a].n,vt:ff[a].n+' · '+cm(ff[a].c),go:goAsset(a)}});
+    var ffItems=Object.keys(ff).filter(function(a){return BY[a]&&ff[a].n>=3}).sort(function(a,b){return ff[b].n-ff[a].n||ff[b].c-ff[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:ff[a].n,vt:ff[a].n+' · '+cm(ff[a].c),tt:money(ff[a].c),go:goAsset(a)}});
     var ffTotal=Object.keys(ff).filter(function(a){return BY[a]&&ff[a].n>=3}).length;
 
     /* fleet */
@@ -600,6 +603,7 @@
     var yr=nowD.getFullYear(),ages=[],AB=[['0 to 2',0,2],['3 to 5',3,5],['6 to 8',6,8],['9 to 11',9,11],['12 to 14',12,14],['15+',15,99]],ab=AB.map(function(){return 0}),asum=0,an=0;
     active.forEach(function(v){var y=parseInt(v.year,10);if(!y)return;var a=yr-y;asum+=a;an++;for(var i=0;i<AB.length;i++){if(a>=AB[i][1]&&a<=AB[i][2]){ab[i]++;break}}});
     var ageGo=AB.map(function(b){return goV('active vehicles aged '+b[0]+' years',function(v){var y=parseInt(v.year,10);if(!y||/^Retired/.test(v.status))return false;var a=yr-y;return a>=b[1]&&a<=b[2]})});
+    var tagItems=TAGLIST.map(function(t){var n=DV.filter(function(v){return (v.tags||[]).indexOf(t)>=0}).length;return {l:t,v:n,vt:cnt(n),go:goV('vehicles tagged '+t,function(v){return (v.tags||[]).indexOf(t)>=0})}});
     var dpc={};active.forEach(function(v){dpc[v.dept]=(dpc[v.dept]||0)+1});
     var dpItems=Object.keys(dpc).sort(function(a,b){return dpc[b]-dpc[a]}).map(function(k){return {l:k||'(none)',v:dpc[k],vt:cnt(dpc[k]),go:goV('active vehicles in '+k,function(v){return !/^Retired/.test(v.status)&&v.dept===k})}});
 
@@ -657,7 +661,7 @@
       '<div class="dgrid">'+
         card('Open work orders by status','',hbars(stItems))+
         card('How long open work orders have been open','',hbars(agItems))+
-        card('Maintenance cost by month and shop','Average '+cm(avgCost)+'/month',cols(months,mser,{fmt:cm,go:mgo,h:190,avg:avgCost,tipCol:function(i){return wotip(opened[i],costTot[i])},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
+        card('Maintenance cost by month and shop','Average '+cm(avgCost)+'/month',cols(months,mser,{fmt:cm,tfmt:money,go:mgo,h:190,avg:avgCost,tipCol:function(i){return wotip(opened[i],costTot[i])},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
         card('Work orders opened per month','Average '+cnt(Math.round(avgOpened))+'/month',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo,avg:avgOpened}))+
         card('Road calls per month','Average '+cnt(Math.round(avgRoads))+'/month',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo,avg:avgRoads}))+
         card('What the work orders are for','',hbars(thItems))+
@@ -672,10 +676,11 @@
         card('Vehicles by status','',pie(fstItems,cnt(DV.length)))+
         card('Replacement outlook','',
           '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
-          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}))+
+          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,tfmt:money,plain:true}))+
         card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
         card('Active vehicles by category','',hbars(catItems))+
         card('Active vehicles by department','',hbars(dpItems))+
+        (TAGLIST.length?card('Vehicles by tag','',hbars(tagItems)):'')+
       '</div>'+
       '';
     document.getElementById('dper').onchange=function(){dper=this.value;renderDash()};
@@ -809,7 +814,7 @@
     var slice=filtered.slice(page*PAGE,page*PAGE+PAGE);
     function th(k,l){return '<th data-k="'+k+'">'+l+(sortKey===k?' <span class="arr">'+(sortDir>0?'&#9650;':'&#9660;')+'</span>':'')+'</th>'}
     var rows=slice.map(function(v){
-      return '<tr data-id="'+esc(v.asset)+'"><td class="asset">'+esc(v.asset)+'</td><td>'+esc(v.year)+'</td><td>'+esc(v.make)+'</td><td>'+esc(v.model)+'</td><td>'+esc(v.dept)+'</td><td>'+esc(v.division)+'</td><td>'+esc(v.contact)+'</td><td>'+badge(v.status)+'</td></tr>';
+      return '<tr data-id="'+esc(v.asset)+'"><td class="asset">'+esc(v.asset)+'</td><td>'+esc(v.year)+'</td><td>'+esc(v.make)+'</td><td>'+esc(v.model)+'</td><td>'+esc(v.dept)+'</td><td>'+esc(v.division)+'</td><td>'+esc(v.contact)+'</td><td>'+badge(v.status)+'</td><td>'+tagChips(v)+'</td></tr>';
     }).join('');
     app.innerHTML=
       (vpre?'<div class="prebar">Showing <b>'+esc(vpre.label)+'</b><button class="btn" id="vpc">Show all vehicles</button></div>':'')+
@@ -825,11 +830,12 @@
         '<label>Division<select id="fv">'+opts(divs,f.division,'All divisions')+'</select></label>'+
         '<label>Status<select id="fs">'+opts(statuses,f.status,'All statuses')+'</select></label>'+
         '<label>Supervisor<select id="fu">'+opts(sups,f.supervisor,'All supervisors')+'</select></label>'+
+        (TAGLIST.length?'<label>Tag<select id="ft">'+opts(TAGLIST,f.tag,'All tags')+'</select></label>':'')+
         '<button class="btn" id="clr">Clear filters</button>'+
         '<div class="eqbox"><label class="ck"><input type="checkbox" id="feq"'+(showEq?' checked':'')+'> Fleet Equipment ('+EQN+')</label><label class="ck"><input type="checkbox" id="fnt"'+(showNT?' checked':'')+'> Non Targeted ('+NTN+')</label></div>'+
       '</div>'+
       '<div class="tablewrap">'+(filtered.length?
-        '<table><thead><tr>'+th('asset','Vehicle No.')+th('year','Year')+th('make','Make')+th('model','Model')+th('dept','Department')+th('division','Division')+th('contact','Contact')+th('status','Status')+'</tr></thead><tbody>'+rows+'</tbody></table>'
+        '<table><thead><tr>'+th('asset','Vehicle No.')+th('year','Year')+th('make','Make')+th('model','Model')+th('dept','Department')+th('division','Division')+th('contact','Contact')+th('status','Status')+'<th>Tags</th></tr></thead><tbody>'+rows+'</tbody></table>'
         :'<div class="empty">No vehicles match.</div>')+'</div>'+
       '<div class="pager"><span>'+(filtered.length?('Showing '+(page*PAGE+1)+' to '+Math.min(filtered.length,page*PAGE+PAGE)+' of '+filtered.length.toLocaleString()):'')+'</span>'+
         '<span><button class="btn" id="pp"'+(page===0?' disabled':'')+'>Previous</button> <button class="btn" id="pn"'+(page>=pages-1?' disabled':'')+'>Next</button></span></div>';
@@ -838,10 +844,11 @@
     document.getElementById('fv').onchange=function(){f.division=this.value;page=0;applyFilters();renderList()};
     document.getElementById('fs').onchange=function(){f.status=this.value;page=0;applyFilters();renderList()};
     document.getElementById('fu').onchange=function(){f.supervisor=this.value;page=0;applyFilters();renderList()};
+    var ftg=document.getElementById('ft');if(ftg)ftg.onchange=function(){f.tag=this.value;page=0;applyFilters();renderList()};
     document.getElementById('feq').onchange=function(){showEq=this.checked;page=0;applyFilters();renderList()};
     document.getElementById('fnt').onchange=function(){showNT=this.checked;page=0;applyFilters();renderList()};
     var vpc=document.getElementById('vpc');if(vpc)vpc.onclick=function(){vpre=null;applyFilters();renderList()};
-    document.getElementById('clr').onclick=function(){vpre=null;showEq=false;showNT=false;f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();renderList()};
+    document.getElementById('clr').onclick=function(){vpre=null;showEq=false;showNT=false;f={dept:'',division:'',status:'',supervisor:'',tag:''};query='';q.value='';page=0;applyFilters();renderList()};
     document.getElementById('pp').onclick=function(){page--;renderList();window.scrollTo(0,0)};
     document.getElementById('pn').onclick=function(){page++;renderList();window.scrollTo(0,0)};
     Array.prototype.forEach.call(app.querySelectorAll('th[data-k]'),function(el){
@@ -950,6 +957,7 @@
   fetch('vehicles.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
     DATA=d;d.forEach(function(v){BY[v.asset]=v;if(isEq(v.asset)){if(isNT(v.asset)){v.category='Non Targeted';NTN++}else{v.category='Fleet Equipment';EQN++}}});
     applyFilters();render();
+    fetch('tags.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(t){TAGLIST=t.list||[];DATA.forEach(function(v){v.tags=(t.assets||{})[v.asset]||[]});applyFilters();render()}).catch(function(){});
   }).catch(function(err){
     app.innerHTML='<div class="empty">The vehicle data did not load ('+esc(err.message)+'). Try reloading the page.</div>';
   });
