@@ -155,6 +155,10 @@
   .tip{white-space:pre-line;position:fixed;z-index:50;display:none;background:var(--nav);color:#fff;font-size:12px;padding:5px 9px;border-radius:6px;pointer-events:none;max-width:320px}
   .prebar{display:flex;gap:10px;align-items:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;padding:7px 12px;margin-bottom:12px}
   .att{display:flex;flex-direction:column}
+  .ar{cursor:pointer;align-items:center}.ar:hover{background:var(--accent-soft)}.ar>div:first-child::before{content:'\25B8';display:inline-block;width:16px;color:var(--muted)}.ar.open>div:first-child::before{content:'\25BE'}
+  .ar>div:first-child{display:block}
+  .apanel{display:none;padding:4px 6px 12px 22px;max-height:380px;overflow:auto}.ar.open+.apanel{display:block}
+  .apanel .tablewrap{max-height:none}.apanel td,.apanel th{padding:6px 10px;font-size:13px}.amore{padding:8px 2px;color:var(--muted);font-size:12px}
   .ar{display:flex;justify-content:space-between;gap:12px;padding:8px 6px;border-top:1px solid var(--line)}.ar:first-child{border-top:0}
   .ar b{font-weight:650}.ar span{color:var(--muted);font-size:12px;display:block}
   .mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
@@ -576,17 +580,36 @@
     var zeroMi=active.filter(function(v){return v.meterType!=='No Meter'&&!v.meter});
     var zeroCost=WOD.filter(function(w){return w.s==='Closed'&&!w.k});
     var orphan=WOD.filter(function(w){return !BY[w.a]});
-    function ar(label,sub,n,go){return '<div class="ar'+(go!=null?' clk':'')+'"'+(go!=null?' data-go="'+go+'"':'')+'><div><b>'+esc(label)+'</b><span>'+esc(sub)+'</span></div><b>'+cnt(n)+'</b></div>'}
     var oosSet={};oosNoWO.forEach(function(v){oosSet[v.asset]=1});
     var nwSet={};noWO12.forEach(function(v){nwSet[v.asset]=1});
     var zmSet={};zeroMi.forEach(function(v){zmSet[v.asset]=1});
+    var LIM=40;
+    function th2(cols){return '<tr>'+cols.map(function(c){return '<th>'+esc(c)+'</th>'}).join('')+'</tr>'}
+    function woTable(arr,all,sortFn){
+      arr=arr.slice().sort(sortFn||function(x,y){return y.d<x.d?-1:y.d>x.d?1:0});
+      var rows=arr.slice(0,LIM).map(function(w){return '<tr data-wo="'+w.n+'"><td class="asset">'+w.n+'</td><td>'+esc(w.a||'(none)')+'</td><td>'+fmtD(w.d)+'</td><td class="num">'+fdays(w.days)+'</td><td>'+badge(w.s)+'</td><td class="clip" style="max-width:420px">'+esc(woText(w))+'</td><td class="num">'+money(w.k)+'</td></tr>'}).join('');
+      return '<div class="tablewrap static"><table><thead>'+th2(['WO #','Vehicle','Opened','Days','Status','Description','Total Cost'])+'</thead><tbody>'+rows+'</tbody></table></div>'+(arr.length>LIM?'<div class="amore">Showing '+LIM+' of '+cnt(arr.length)+'. <button class="btn" data-go="'+all+'">See all '+cnt(arr.length)+' in the work order list</button></div>':'');
+    }
+    function vTable(arr,all,extraCol,extraFn){
+      arr=arr.slice().sort(function(x,y){return num(x.asset)-num(y.asset)});
+      var rows=arr.slice(0,LIM).map(function(v){return '<tr data-v="'+esc(v.asset)+'"><td class="asset">'+esc(v.asset)+'</td><td>'+esc([v.year,v.make,v.model].filter(Boolean).join(' '))+'</td><td>'+esc(v.dept)+'</td><td>'+esc(v.division)+'</td><td>'+esc(extraFn(v))+'</td></tr>'}).join('');
+      return '<div class="tablewrap static"><table><thead>'+th2(['Vehicle','Description','Department','Division',extraCol])+'</thead><tbody>'+rows+'</tbody></table></div>'+(arr.length>LIM?'<div class="amore">Showing '+LIM+' of '+cnt(arr.length)+'. <button class="btn" data-go="'+all+'">See all '+cnt(arr.length)+' in the vehicle list</button></div>':'');
+    }
+    function ar(label,sub,n,panel){return '<div class="ar" data-tg="1"><div><b>'+esc(label)+'</b><span>'+esc(sub)+'</span></div><b>'+cnt(n)+'</b></div><div class="apanel">'+panel+'</div>'}
+    var g1=goV('Out of Service vehicles with no open work order',function(v){return !!oosSet[v.asset]});
+    var g2=goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open');
+    var g3=goV('in service vehicles with no work order in 12 months',function(v){return !!nwSet[v.asset]});
+    var g4=goV('active vehicles with zero or blank mileage',function(v){return !!zmSet[v.asset]});
+    var g5=goWO('closed work orders with $0 cost',function(w){return w.s==='Closed'&&!w.k});
+    var g6=goWO('work orders on assets not in the asset list',function(w){return !BY[w.a]});
+    function lastWO(v){var L=WOBY[v.asset];return L&&L.length?'Last work order '+fmtD(L[0].d):'No work orders'}
     var att=
-      ar('Out of Service with no open work order','The vehicle is marked down but nothing is open on it',oosNoWO.length,goV('Out of Service vehicles with no open work order',function(v){return !!oosSet[v.asset]}))+
-      ar('Open more than 30 days','Open work orders to review for a stuck status',old30.length,goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'))+
-      ar('In service, no work order in 12 months','Could be unused, or work not getting recorded',noWO12.length,goV('in service vehicles with no work order in 12 months',function(v){return !!nwSet[v.asset]}))+
-      ar('Mileage is zero or blank','Active vehicles that should have a meter reading',zeroMi.length,goV('active vehicles with zero or blank mileage',function(v){return !!zmSet[v.asset]}))+
-      ar('Closed with $0 total cost','Closed work orders with no cost recorded',zeroCost.length,goWO('closed work orders with $0 cost',function(w){return w.s==='Closed'&&!w.k}))+
-      ar('Vehicle not in the asset list','Work orders on assets that are not in the current vehicle list',orphan.length,goWO('work orders on assets not in the asset list',function(w){return !BY[w.a]}));
+      ar('Out of Service with no open work order','The vehicle is marked down but nothing is open on it',oosNoWO.length,vTable(oosNoWO,g1,'Status',function(v){return v.status}))+
+      ar('Open more than 30 days','Open work orders to review for a stuck status',old30.length,woTable(old30,g2,function(x,y){return y.days-x.days}))+
+      ar('In service, no work order in 12 months','Could be unused, or work not getting recorded',noWO12.length,vTable(noWO12,g3,'Work orders',lastWO))+
+      ar('Mileage is zero or blank','Active vehicles that should have a meter reading',zeroMi.length,vTable(zeroMi,g4,'Meter type',function(v){return v.meterType||''}))+
+      ar('Closed with $0 total cost','Closed work orders with no cost recorded',zeroCost.length,woTable(zeroCost,g5))+
+      ar('Vehicle not in the asset list','Work orders on assets that are not in the current vehicle list',orphan.length,woTable(orphan,g6));
 
     var sel='<select id="dper">'+Object.keys(PERS).map(function(k){return '<option value="'+k+'"'+(k===dper?' selected':'')+'>'+PERS[k][0]+'</option>'}).join('')+'</select>';
     app.innerHTML=
@@ -868,7 +891,11 @@
   app.addEventListener('mouseover',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(t){tip.textContent=t.getAttribute('data-tip');tip.style.display='block'}else{tip.style.display='none'}});
   app.addEventListener('mousemove',function(e){tip.style.left=Math.max(4,Math.min(e.clientX+14,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=(e.clientY+16)+'px'});
   app.addEventListener('mouseleave',function(){tip.style.display='none'});
-  app.addEventListener('click',function(e){var g=e.target.closest&&e.target.closest('[data-go]');if(g){var fn=gos[+g.getAttribute('data-go')];if(fn){tip.style.display='none';fn()}}});
+  app.addEventListener('click',function(e){
+    var t=e.target.closest&&e.target.closest('[data-tg]');if(t){t.classList.toggle('open');return}
+    var rw=e.target.closest&&e.target.closest('.apanel tr[data-wo]');if(rw){location.hash='wo/'+rw.getAttribute('data-wo');return}
+    var rv=e.target.closest&&e.target.closest('.apanel tr[data-v]');if(rv){openAsset(rv.getAttribute('data-v'));return}
+    var g=e.target.closest&&e.target.closest('[data-go]');if(g){var fn=gos[+g.getAttribute('data-go')];if(fn){tip.style.display='none';fn()}}});
   document.getElementById('navw').onclick=function(){location.hash='wo'};
   window.addEventListener('hashchange',render);
 
