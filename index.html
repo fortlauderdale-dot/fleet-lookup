@@ -382,6 +382,7 @@
     var k=sortKey, r;
     if(k==='asset') r=num(a.asset)-num(b.asset);
     else if(k==='year') r=(parseInt(a.year)||0)-(parseInt(b.year)||0);
+    else if(k==='tags'){var ta=(a.tags||[]).join(', ')||'\uffff',tb=(b.tags||[]).join(', ')||'\uffff';r=ta<tb?-1:ta>tb?1:0}
     else r=String(a[k]).localeCompare(String(b[k]),undefined,{numeric:true});
     if(r===0) r=num(a.asset)-num(b.asset);
     return r*sortDir;
@@ -835,7 +836,7 @@
         '<div class="eqbox"><label class="ck"><input type="checkbox" id="feq"'+(showEq?' checked':'')+'> Fleet Equipment ('+EQN+')</label><label class="ck"><input type="checkbox" id="fnt"'+(showNT?' checked':'')+'> Non Targeted ('+NTN+')</label></div>'+
       '</div>'+
       '<div class="tablewrap">'+(filtered.length?
-        '<table><thead><tr>'+th('asset','Vehicle No.')+th('year','Year')+th('make','Make')+th('model','Model')+th('dept','Department')+th('division','Division')+th('contact','Contact')+th('status','Status')+'<th>Tags</th></tr></thead><tbody>'+rows+'</tbody></table>'
+        '<table><thead><tr>'+th('asset','Vehicle No.')+th('year','Year')+th('make','Make')+th('model','Model')+th('dept','Department')+th('division','Division')+th('contact','Contact')+th('status','Status')+th('tags','Tags')+'</tr></thead><tbody>'+rows+'</tbody></table>'
         :'<div class="empty">No vehicles match.</div>')+'</div>'+
       '<div class="pager"><span>'+(filtered.length?('Showing '+(page*PAGE+1)+' to '+Math.min(filtered.length,page*PAGE+PAGE)+' of '+filtered.length.toLocaleString()):'')+'</span>'+
         '<span><button class="btn" id="pp"'+(page===0?' disabled':'')+'>Previous</button> <button class="btn" id="pn"'+(page>=pages-1?' disabled':'')+'>Next</button></span></div>';
