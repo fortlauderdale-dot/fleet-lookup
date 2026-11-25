@@ -90,7 +90,7 @@
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
   .stat .sl{font-size:12px;color:var(--muted)} .stat .sv{font-size:20px;font-weight:650;line-height:1.25} .stat .ss{font-size:12px;color:var(--muted)}
-  .chips{display:flex;gap:8px;margin-bottom:12px}.chip{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 11px;font-size:12px;font-weight:600}
+  .chips{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.chip .x{cursor:pointer;margin-left:6px;opacity:.55}.chip .x:hover{opacity:1}.chip.add{cursor:pointer;background:transparent;border:1px dashed var(--accent)}.tagin{font:inherit;font-size:12px;padding:2px 10px;border:1px solid var(--accent);border-radius:999px;width:150px;outline:none}.chip{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 11px;font-size:12px;font-weight:600}
   .grp{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px 12px;margin-bottom:12px}
   .grp h3{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:600}
   .kvg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px 18px}
@@ -197,8 +197,57 @@
   var subtab='Services';
   var WO=[], WOIDX={}, WOBY={}, WOLOADED=false, WOERR='', curMode='v';
   var wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false,nt:false}, wq='', wsort={k:'d',dir:-1}, wpage=0, wfiltered=[], mq='', cq='';
-  var TAGLIST=[], EQN=0, NTN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false, showNT=false;
+  var TAGLIST=[], TAGBASE=[], SEED={}, TX={}, TAGDB=null, tagBound=false, EQN=0, NTN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false, showNT=false;
   function tagChips(v){return (v.tags||[]).map(function(t){return '<span class="chip" style="margin-right:4px">'+esc(t)+'</span>'}).join('')}
+  function tagEdit(v){
+    if(!TAGDB)return tagChips(v);
+    return (v.tags||[]).map(function(t){return '<span class="chip">'+esc(t)+'<span class="x" data-rmtag="'+esc(t)+'" title="Remove tag">\u00d7</span></span>'}).join('');
+  }
+  function tagAdd(){return TAGDB?'<span class="chip add" data-addtag="1">+ Add tag</span>':''}
+  function rebuildTags(){
+    DATA.forEach(function(v){var b=SEED[v.asset]||[],x=TX[v.asset]||{},add=x.add||[],rm=x.rm||[];var r=b.filter(function(t){return rm.indexOf(t)<0});add.forEach(function(t){if(r.indexOf(t)<0)r.push(t)});v.tags=r});
+    var ex={};DATA.forEach(function(v){(v.tags||[]).forEach(function(t){if(TAGBASE.indexOf(t)<0)ex[t]=1})});
+    TAGLIST=TAGBASE.concat(Object.keys(ex).sort());
+  }
+  function saveTx(a){try{var x=TX[a];var pr=TAGDB.doc('assetTags/'+a).set({add:x.add,rm:x.rm});if(pr&&pr.catch)pr.catch(function(){})}catch(e){}}
+  function tagChange(a,fn){var x=TX[a]||(TX[a]={add:[],rm:[]});fn(x);rebuildTags();saveTx(a);applyFilters();render()}
+  function addTag(a,t){
+    t=String(t||'').replace(/\s+/g,' ').trim().slice(0,30);if(!t)return;
+    var m=TAGLIST.filter(function(x){return x.toLowerCase()===t.toLowerCase()})[0];if(m)t=m;
+    tagChange(a,function(x){x.rm=x.rm.filter(function(r){return r!==t});if((SEED[a]||[]).indexOf(t)<0&&x.add.indexOf(t)<0)x.add.push(t)});
+  }
+  function rmTag(a,t){tagChange(a,function(x){if(x.add.indexOf(t)>=0)x.add=x.add.filter(function(r){return r!==t});else if(x.rm.indexOf(t)<0)x.rm.push(t)})}
+  function curAsset(){var id=decodeURIComponent(location.hash.slice(1)).split('~')[0];return BY[id]?id:''}
+  function bindTags(){
+    if(tagBound)return;tagBound=true;
+    app.addEventListener('click',function(e){
+      var n=e.target;while(n&&n!==app){
+        if(n.getAttribute&&n.getAttribute('data-rmtag')!=null){rmTag(curAsset(),n.getAttribute('data-rmtag'));return}
+        if(n.getAttribute&&n.getAttribute('data-addtag')!=null){
+          var dl='<datalist id="tagopts">'+TAGLIST.map(function(t){return '<option value="'+esc(t)+'">'}).join('')+'</datalist>';
+          n.outerHTML='<input class="tagin" id="tagin" list="tagopts" placeholder="Tag name" maxlength="30">'+dl;
+          var i=document.getElementById('tagin');if(i)i.focus();return}
+        n=n.parentNode}
+    });
+    app.addEventListener('keydown',function(e){
+      if(!e.target||e.target.id!=='tagin')return;
+      if(e.key==='Enter'){e.preventDefault();addTag(curAsset(),e.target.value)}
+      else if(e.key==='Escape'){render()}
+    });
+  }
+  function connectTagDb(){
+    if(!(window.claude&&window.claude.use))return;
+    window.claude.use('db').then(function(db){
+      if(!db)return;TAGDB=db;
+      db.collection('assetTags').onSnapshot(function(snap){
+        var docs=snap.docs?snap.docs.slice():[];if(!docs.length&&snap.forEach)snap.forEach(function(d){docs.push(d)});
+        TX={};docs.forEach(function(d){var x=d.data?d.data():d;TX[d.id]={add:(x&&x.add)||[],rm:(x&&x.rm)||[]}});
+        rebuildTags();applyFilters();
+        var ae=document.activeElement;if(!(ae&&ae.id==='tagin'))render();
+      },function(){});
+      rebuildTags();render();
+    }).catch(function(){});
+  }
   function isEq(a){return !/^V\d+$/i.test(a||'')}
   function isNT(a){return /^z(?!\d)/i.test(a||'')}
   function hiddenAsset(a,fe,nt){return isEq(a)&&(isNT(a)?!nt:!fe)}
@@ -277,7 +326,7 @@
   var TABFN={
     'Overview':function(v){
       var hrs=v.meterType==='Engine Hours';
-      var chips=tagChips(v)+[v.hasGPS?'GPS':'',v.hasCamera?'Camera':'',v.hasCanceiver?'Canceiver':''].filter(Boolean).map(function(c){return '<span class="chip">'+c+'</span>'}).join('');
+      var chips=tagEdit(v)+[v.hasGPS?'GPS':'',v.hasCamera?'Camera':'',v.hasCanceiver?'Canceiver':''].filter(Boolean).map(function(c){return '<span class="chip">'+c+'</span>'}).join('')+tagAdd();
       return '<div class="stats">'+
           stat(hrs?'Engine hours':'Mileage',usage(v))+
           (eqShown(v)?stat('Miles equivalent',rnd(v.milesEq)+' miles'):'')+
@@ -958,7 +1007,7 @@
   fetch('vehicles.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
     DATA=d;d.forEach(function(v){BY[v.asset]=v;if(isEq(v.asset)){if(isNT(v.asset)){v.category='Non Targeted';NTN++}else{v.category='Fleet Equipment';EQN++}}});
     applyFilters();render();
-    fetch('tags.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(t){TAGLIST=t.list||[];DATA.forEach(function(v){v.tags=(t.assets||{})[v.asset]||[]});applyFilters();render()}).catch(function(){});
+    fetch('tags.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(t){TAGBASE=t.list||[];SEED=t.assets||{};bindTags();rebuildTags();applyFilters();render();connectTagDb()}).catch(function(){});
   }).catch(function(err){
     app.innerHTML='<div class="empty">The vehicle data did not load ('+esc(err.message)+'). Try reloading the page.</div>';
   });
