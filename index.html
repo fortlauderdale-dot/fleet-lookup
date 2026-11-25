@@ -475,11 +475,12 @@
     for(var t=0;t<=top+1e-9;t+=step){grid+='<div class="gl" style="bottom:'+(t/top*100)+'%"><span>'+fmt(t)+'</span></div>'}
     var n=cats.length,tpl='grid-template-columns:repeat('+n+',1fr)';
     var tips=cats.map(function(c,i){var nz=series.filter(function(x){return x.v[i]}),ls=nz.map(function(x){return x.n+': '+fmt(x.v[i])});
+      if(o.tipCol)return o.tipCol(i);
       if(series.length===1)return fmt(tot[i])+' '+series[0].n;
       if(o.plain||nz.length<=1&&!nz.length)return fmt(tot[i])+(c.x?'\n'+c.x:'');
       return ls.join('\n')+(nz.length>1?'\nTotal: '+fmt(tot[i]):'')});
     var cs=cats.map(function(c,i){
-      var segs=series.map(function(s){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(series.length>1&&!o.plain?s.n+': '+fmt(v):tips[i])+'"></div>'}).join('');
+      var segs=series.map(function(s,si){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(o.tipSeg?o.tipSeg(i,si):series.length>1&&!o.plain?s.n+': '+fmt(v):tips[i])+'"></div>'}).join('');
       var g=o.go&&o.go[i]!=null?o.go[i]:null;
       return '<div class="cc'+(g!=null?' clk':'')+'"'+(g!=null?' data-go="'+g+'"':'')+' data-tip="'+esc(tips[i])+'"><div class="cs">'+segs+'</div></div>';
     }).join('');
@@ -545,9 +546,10 @@
     /* months */
     var months=[];for(var i=11;i>=0;i--){var d=new Date(nowD.getFullYear(),nowD.getMonth()-i,1);months.push({k:d.getFullYear()+'-'+p2(d.getMonth()+1),l:d.toLocaleString('en-US',{month:'short'})+(d.getMonth()===0||i===11?' ’'+String(d.getFullYear()).slice(2):''),t:d.toLocaleString('en-US',{month:'long',year:'numeric'})+(i===0?' (to date)':'')})}
     var mi={};months.forEach(function(m,i){mi[m.k]=i});
-    var cost=SHOPS.map(function(){return months.map(function(){return 0})}),other=months.map(function(){return 0}),opened=months.map(function(){return 0}),roads=months.map(function(){return 0});
-    WOD.forEach(function(w){var i=mi[w.d.slice(0,7)];if(i==null)return;var si=SHOPS.indexOf(w.l);if(si<0)other[i]+=w.k||0;else cost[si][i]+=w.k||0;opened[i]++;if(w.rc)roads[i]++});
+    var cost=SHOPS.map(function(){return months.map(function(){return 0})}),other=months.map(function(){return 0}),opened=months.map(function(){return 0}),roads=months.map(function(){return 0}),ccount=SHOPS.concat(['Other']).map(function(){return months.map(function(){return 0})});
+    WOD.forEach(function(w){var i=mi[w.d.slice(0,7)];if(i==null)return;var si=SHOPS.indexOf(w.l);if(si<0){other[i]+=w.k||0;ccount[SHOPS.length][i]++}else{cost[si][i]+=w.k||0;ccount[si][i]++}opened[i]++;if(w.rc)roads[i]++});
     var mser=SHOPS.map(function(n,i){return {n:n,c:SC[i],v:cost[i]}});mser.push({n:'Other',c:'var(--s7)',v:other});
+    function wotip(n,c){return cnt(n)+' work orders'+(n?'\n$'+cnt(Math.round(c/n))+' average':'')}
     var mgo=months.map(function(m){return goWO('work orders opened in '+m.t,function(w){return w.d.slice(0,7)===m.k})});
     var rgo=months.map(function(m){return goWO('road calls in '+m.t,function(w){return w.rc&&w.d.slice(0,7)===m.k})});
 
@@ -631,7 +633,7 @@
       '<div class="dgrid">'+
         card('Open work orders by status','Click a status to open the list',hbars(stItems))+
         card('How long open work orders have been open','Days since opened',hbars(agItems))+
-        card('Maintenance cost by month and shop','Last 12 months, by date opened. Click a month for its work orders.',cols(months,mser,{fmt:cm,go:mgo,h:190}),'wide')+
+        card('Maintenance cost by month and shop','Last 12 months, by date opened. Click a month for its work orders.',cols(months,mser,{fmt:cm,go:mgo,h:190,tipCol:function(i){return wotip(opened[i],mser.reduce(function(a,x){return a+x.v[i]},0))},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
         card('Work orders opened per month','',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo}))+
         card('Road calls per month','',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo}))+
         card('Average days down by shop','Closed work orders, '+perName.toLowerCase()+' (days · count)',hbars(shopItems))+
