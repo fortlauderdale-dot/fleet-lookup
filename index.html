@@ -465,9 +465,12 @@
     var mx=Math.max.apply(null,tot.concat([1])),step=niceStep(mx/4),top=Math.ceil(mx/step-1e-9)*step,grid='';
     for(var t=0;t<=top+1e-9;t+=step){grid+='<div class="gl" style="bottom:'+(t/top*100)+'%"><span>'+fmt(t)+'</span></div>'}
     var n=cats.length,tpl='grid-template-columns:repeat('+n+',1fr)';
-    var tips=cats.map(function(c,i){var ls=series.filter(function(x){return x.v[i]}).map(function(x){return x.n+': '+fmt(x.v[i])});return (series.length>1?c.t+'\n'+ls.join('\n')+(ls.length?'\n':'')+'Total: '+fmt(tot[i]):fmt(tot[i])+' '+series[0].n)});
+    var tips=cats.map(function(c,i){var nz=series.filter(function(x){return x.v[i]}),ls=nz.map(function(x){return x.n+': '+fmt(x.v[i])});
+      if(series.length===1)return fmt(tot[i])+' '+series[0].n;
+      if(o.plain||nz.length<=1&&!nz.length)return fmt(tot[i])+(c.x?'\n'+c.x:'');
+      return ls.join('\n')+(nz.length>1?'\nTotal: '+fmt(tot[i]):'')});
     var cs=cats.map(function(c,i){
-      var segs=series.map(function(s){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(series.length>1?c.t+' · '+s.n+': '+fmt(v):tips[i])+'"></div>'}).join('');
+      var segs=series.map(function(s){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(series.length>1&&!o.plain?s.n+': '+fmt(v):tips[i])+'"></div>'}).join('');
       var g=o.go&&o.go[i]!=null?o.go[i]:null;
       return '<div class="cc'+(g!=null?' clk':'')+'"'+(g!=null?' data-go="'+g+'"':'')+' data-tip="'+esc(tips[i])+'"><div class="cs">'+segs+'</div></div>';
     }).join('');
@@ -571,8 +574,8 @@
     active.forEach(function(v){esc$+=v.annualEscrow||0;if(!v.projDate||!v.projCost)return;var key=v.projDate.slice(6)+'-'+v.projDate.slice(0,2)+'-'+v.projDate.slice(3,5);
       var limit=dayStr(new Date(nowD.getTime()+365*864e5));
       if(key<today){ov.c+=v.projCost;ov.n++}else{var y=key.slice(0,4);(byY[y]=byY[y]||{c:0,n:0});byY[y].c+=v.projCost;byY[y].n++;if(key<=limit){nx.c+=v.projCost;nx.n++}}});
-    var ycats=[{l:'Overdue',t:'Overdue for replacement'}],yo=[ov.c],ys=[0],ycnt=[ov.n];
-    Object.keys(byY).sort().forEach(function(y){if(+y>yr+6)return;ycats.push({l:y,t:'Replacements projected in '+y});yo.push(0);ys.push(byY[y].c);ycnt.push(byY[y].n)});
+    var ycats=[{l:'Overdue',t:'Overdue',x:cnt(ov.n)+' vehicles'}],yo=[ov.c],ys=[0],ycnt=[ov.n];
+    Object.keys(byY).sort().forEach(function(y){if(+y>yr+6)return;ycats.push({l:y,t:y,x:cnt(byY[y].n)+' vehicles'});yo.push(0);ys.push(byY[y].c);ycnt.push(byY[y].n)});
     var ovGo=goV('vehicles past their projected replacement date',function(v){if(/^Retired/.test(v.status)||!v.projDate||!v.projCost)return false;return v.projDate.slice(6)+'-'+v.projDate.slice(0,2)+'-'+v.projDate.slice(3,5)<today});
 
     /* needs attention */
@@ -637,7 +640,7 @@
         card('Active vehicles by department','',hbars(dpItems))+
         card('Replacement outlook','Projected cost by year from the life cycle data',
           '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
-          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm}),'wide')+
+          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}),'wide')+
         card('Needs attention','Data and status items worth a look',  '<div class="att">'+att+'</div>','wide')+
       '</div>'+
       '<div class="note" style="margin-top:12px">Fleet equipment and non-targeted items are left out. Cost and counts use the date a work order was opened. The work order history in this export starts in late November 2025, so comparisons to earlier periods are not available yet.</div>';
