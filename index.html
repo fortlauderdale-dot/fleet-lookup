@@ -144,6 +144,8 @@
   .pa{position:relative}
   .gl{position:absolute;left:-46px;right:0;border-top:1px solid var(--line);height:0}
   .gl span{position:absolute;left:0;top:-8px;width:40px;text-align:right;font-size:11px;color:var(--muted);background:var(--panel)}
+  .avgl{position:absolute;left:0;right:0;height:0;border-top:2px dashed var(--ink);opacity:.55;pointer-events:none}
+  .dcard{display:flex;flex-direction:column}.dcard .hb{flex:1;justify-content:space-around}.dcard .ch{margin-top:auto}
   .cr,.cl{display:grid}
   .cr{position:absolute;inset:0}
   .cc{height:100%;display:flex;align-items:flex-end;justify-content:center}
@@ -472,7 +474,7 @@
   function cols(cats,series,o){
     o=o||{};var fmt=o.fmt||cnt;
     var tot=cats.map(function(c,i){return series.reduce(function(a,s){return a+(s.v[i]||0)},0)});
-    var mx=Math.max.apply(null,tot.concat([1])),step=niceStep(mx/4),top=Math.ceil(mx/step-1e-9)*step,grid='';
+    var mx=Math.max.apply(null,tot.concat([1,o.avg||0])),step=niceStep(mx/4),top=Math.ceil(mx/step-1e-9)*step,grid='';
     for(var t=0;t<=top+1e-9;t+=step){grid+='<div class="gl" style="bottom:'+(t/top*100)+'%"><span>'+fmt(t)+'</span></div>'}
     var n=cats.length,tpl='grid-template-columns:repeat('+n+',1fr)';
     var tips=cats.map(function(c,i){var nz=series.filter(function(x){return x.v[i]}),ls=nz.map(function(x){return x.n+': '+fmt(x.v[i])});
@@ -487,7 +489,7 @@
     }).join('');
     var lbl=cats.map(function(c,i){return '<div class="cx" data-tip="'+esc(tips[i])+'">'+esc(c.l)+'</div>'}).join('');
     var lg=series.length>1||o.legend?'<div class="lg">'+series.map(function(s){return '<span><i style="background:'+s.c+'"></i>'+esc(s.n)+'</span>'}).join('')+'</div>':'';
-    return '<div class="ch"><div class="pa" style="height:'+(o.h||170)+'px">'+grid+'<div class="cr" style="'+tpl+'">'+cs+'</div></div><div class="cl" style="'+tpl+'">'+lbl+'</div></div>'+lg;
+    return '<div class="ch"><div class="pa" style="height:'+(o.h||170)+'px">'+grid+'<div class="cr" style="'+tpl+'">'+cs+'</div>'+(o.avg?'<div class="avgl" style="bottom:'+(o.avg/top*100)+'%"></div>':'')+'</div><div class="cl" style="'+tpl+'">'+lbl+'</div></div>'+lg;
   }
 
   function renderDash(){
@@ -541,7 +543,7 @@
     /* open by status and aging */
     var sc={};open.forEach(function(w){sc[w.s]=(sc[w.s]||0)+1});
     var stItems=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).map(function(k){return {l:k,v:sc[k],vt:cnt(sc[k]),go:goWO('open work orders with status '+k,function(w){return w.s===k},'Open')}});
-    var AG=[['0 to 2 days',0,2,'var(--good)'],['3 to 7 days',2,7,'var(--warn)'],['8 to 30 days',7,30,'var(--serious)'],['Over 30 days',30,1e9,'var(--crit)']];
+    var AG=[['0 to 2 days',0,2,'var(--good)'],['3 to 7 days',2,7,'var(--good)'],['8 to 14 days',7,14,'var(--warn)'],['15 to 30 days',14,30,'var(--serious)'],['31 to 60 days',30,60,'var(--crit)'],['Over 60 days',60,1e9,'var(--crit)']];
     var agItems=AG.map(function(b){var lo=b[1],hi=b[2];var n=open.filter(function(w){return w.days>lo&&w.days<=hi||(lo===0&&w.days<=hi)}).length;return {l:b[0],v:n,vt:cnt(n),c:b[3],go:goWO('open work orders, '+b[0],function(w){return isOpenW(w)&&(lo===0?w.days<=hi:w.days>lo&&w.days<=hi)},'Open')}});
 
     /* months */
@@ -550,6 +552,8 @@
     var cost=SHOPS.map(function(){return months.map(function(){return 0})}),other=months.map(function(){return 0}),opened=months.map(function(){return 0}),roads=months.map(function(){return 0}),ccount=SHOPS.concat(['Other']).map(function(){return months.map(function(){return 0})});
     WOD.forEach(function(w){var i=mi[w.d.slice(0,7)];if(i==null)return;var si=SHOPS.indexOf(w.l);if(si<0){other[i]+=w.k||0;ccount[SHOPS.length][i]++}else{cost[si][i]+=w.k||0;ccount[si][i]++}opened[i]++;if(w.rc)roads[i]++});
     var mser=SHOPS.map(function(n,i){return {n:n,c:SC[i],v:cost[i]}});mser.push({n:'Other',c:'var(--s7)',v:other});
+    function avgFull(a){var t=0;for(var i=0;i<a.length-1;i++)t+=a[i];return t/Math.max(1,a.length-1)}
+    var costTot=months.map(function(m,i){return mser.reduce(function(a,x){return a+x.v[i]},0)}),avgOpened=avgFull(opened),avgRoads=avgFull(roads),avgCost=avgFull(costTot);
     function wotip(n,c){return cnt(n)+' work orders'+(n?'\n$'+cnt(Math.round(c/n))+' average':'')}
     var mgo=months.map(function(m){return goWO('work orders opened in '+m.t,function(w){return w.d.slice(0,7)===m.k})});
     var rgo=months.map(function(m){return goWO('road calls in '+m.t,function(w){return w.rc&&w.d.slice(0,7)===m.k})});
@@ -628,34 +632,34 @@
 
     var sel='<select id="dper">'+Object.keys(PERS).map(function(k){return '<option value="'+k+'"'+(k===dper?' selected':'')+'>'+PERS[k][0]+'</option>'}).join('')+'</select>';
     app.innerHTML=
-      '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label><span class="note">Click any number or bar to see the work orders or vehicles behind it.</span></div>'+
+      '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label></div>'+
       '<div class="dsec">Right Now</div><div class="dtiles">'+now+'</div>'+
       '<div class="dsec">'+esc(tc(perName))+'</div><div class="dtiles">'+pt+'</div>'+
       '<div class="dgrid">'+
-        card('Open work orders by status','Click a status to open the list',hbars(stItems))+
-        card('How long open work orders have been open','Days since opened',hbars(agItems))+
-        card('Maintenance cost by month and shop','Last 12 months, by date opened. Click a month for its work orders.',cols(months,mser,{fmt:cm,go:mgo,h:190,tipCol:function(i){return wotip(opened[i],mser.reduce(function(a,x){return a+x.v[i]},0))},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
-        card('Work orders opened per month','',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo}))+
-        card('Road calls per month','',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo}))+
-        card('Average days down by shop','Closed work orders, '+perName.toLowerCase()+' (days · count)',hbars(shopItems))+
-        card('What the work orders are for','Matched on keywords in the repair description, one group per work order. '+perName+' (count · cost)',hbars(thItems))+
-        card('Top 10 vehicles by maintenance cost',perName,hbars(topV))+
-        card('Most work orders, last 90 days',ffTotal+' vehicles had 3 or more (count · cost)',hbars(ffItems))+
-        card('Maintenance cost by department',perName,hbars(depItems))+
-        card('Maintenance cost per active vehicle','Departments with 10 or more vehicles. '+perName,hbars(depPV))+
+        card('Open work orders by status','',hbars(stItems))+
+        card('How long open work orders have been open','',hbars(agItems))+
+        card('Maintenance cost by month and shop','Average '+cm(avgCost)+' per month',cols(months,mser,{fmt:cm,go:mgo,h:190,avg:avgCost,tipCol:function(i){return wotip(opened[i],costTot[i])},tipSeg:function(i,si){return wotip(ccount[si][i],mser[si].v[i])}}),'wide')+
+        card('Work orders opened per month','Average '+cnt(Math.round(avgOpened))+' per month',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo,avg:avgOpened}))+
+        card('Road calls per month','Average '+cnt(Math.round(avgRoads))+' per month',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo,avg:avgRoads}))+
+        card('What the work orders are for','',hbars(thItems))+
+        card('Maintenance cost by department','',hbars(depItems))+
+        card('Top 10 vehicles by maintenance cost','',hbars(topV))+
+        card('Most work orders, last 90 days',ffTotal+' vehicles with 3 or more',hbars(ffItems))+
+        card('Needs attention','',  '<div class="att">'+att+'</div>','wide')+
+        card('Average days down by shop','',hbars(shopItems))+
+        card('Maintenance cost per active vehicle','Departments with 10 or more vehicles',hbars(depPV))+
       '</div>'+
       '<div class="dsec">The Fleet</div>'+
       '<div class="dgrid">'+
-        card('Vehicles by status','All '+cnt(DV.length)+' assets',hbars(fstItems))+
-        card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years by model year',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
-        card('Active vehicles by category','Top 10',hbars(catItems))+
+        card('Vehicles by status','',hbars(fstItems))+
+        card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
+        card('Active vehicles by category','',hbars(catItems))+
         card('Active vehicles by department','',hbars(dpItems))+
-        card('Replacement outlook','Projected cost by year from the life cycle data',
+        card('Replacement outlook','',
           '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
           cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}),'wide')+
-        card('Needs attention','',  '<div class="att">'+att+'</div>','wide')+
       '</div>'+
-      '<div class="note" style="margin-top:12px">Fleet equipment and non-targeted items are left out. Cost and counts use the date a work order was opened. The work order history in this export starts in late November 2025, so comparisons to earlier periods are not available yet.</div>';
+      '';
     document.getElementById('dper').onchange=function(){dper=this.value;renderDash()};
     window.scrollTo(0,0);
   }
