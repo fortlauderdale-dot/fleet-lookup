@@ -453,7 +453,7 @@
   function cm(n){n=Number(n)||0;var a=Math.abs(n);return a>=1e6?'$'+(n/1e6).toFixed(a>=1e7?1:2)+'M':a>=1e3?'$'+Math.round(n/1e3)+'K':'$'+Math.round(n)}
   function cnt(n){return Number(n).toLocaleString('en-US')}
   function reg(fn){gos.push(fn);return gos.length-1}
-  function goWO(label,fn,view){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,nt:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort={k:'d',dir:-1};location.hash='wo'})}
+  function goWO(label,fn,view,srt){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,nt:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort=srt||{k:'d',dir:-1};location.hash='wo'})}
   function goV(label,fn){return reg(function(){vpre={label:label,fn:fn};f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();location.hash=''})}
   function goAsset(a,t){return BY[a]?reg(function(){tab=t||'Maintenance';mq='';cq='';location.hash=encodeURIComponent(a)}):null}
   function vdesc(a){var v=BY[a];return v?[v.year,v.make,v.model].filter(Boolean).join(' '):''}
@@ -521,7 +521,7 @@
     var now=
       dtile('Open work orders',cnt(open.length),cnt(nVeh)+' vehicles',goWO('open work orders',isOpenW,'Open'))+
       dtile('Out of Service vehicles',cnt(oos.length),oosNoWO.length+' with no open work order',goV('vehicles marked Out of Service',function(v){return v.status==='Out of Service'}),oos.length?'alert':'')+
-      dtile('Waiting on parts',cnt(waiting.length),'',goWO('work orders waiting on parts',function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'},'Open'))+
+      dtile('Waiting on parts',cnt(waiting.length),'',goWO('work orders waiting on parts',function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'},'Open',{k:'s',dir:1}))+
       dtile('Parts available',cnt(parts.length),'',goWO('work orders with parts available',function(w){return w.s==='Parts Available'},'Open'))+
       dtile('Open over 30 days',cnt(old30.length),'',goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'),old30.length?'alert':'')+
       dtile('Opened today',cnt(openToday.length),'',goWO('work orders opened today',function(w){return w.d.slice(0,10)===today}))+
