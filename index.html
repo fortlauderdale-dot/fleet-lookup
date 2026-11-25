@@ -32,7 +32,7 @@
   .searchwrap input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid transparent;font-size:15px;background:#fff;color:#1b2733}
   .searchwrap input:focus{outline:3px solid #7fb0ff}
   .hint{font-size:12px;opacity:.7;white-space:nowrap}
-  main{max-width:1300px;margin:0 auto;padding:20px}
+  main{max-width:2200px;margin:0 auto;padding:20px 28px}
   .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
   .tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .tile .n{font-size:26px;font-weight:650;line-height:1.1}
@@ -104,11 +104,65 @@
   .note{color:var(--muted);padding:6px 2px}
   .tabempty{background:var(--panel);border:1px dashed var(--line);border-radius:10px;padding:48px 20px;text-align:center;color:var(--muted)}
   .tabempty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+  .nav{display:flex;gap:4px}
+  .nav button{background:transparent;border:0;color:#fff;opacity:.7;padding:8px 14px;border-radius:7px;font-weight:600}
+  .nav button:hover{opacity:1;background:rgba(255,255,255,.1)}
+  .nav button.on{opacity:1;background:rgba(255,255,255,.18)}
+  .seg{display:flex}.seg .btn{border-radius:0;margin-left:-1px}.seg .btn:first-child{border-radius:7px 0 0 7px;margin-left:0}.seg .btn:last-child{border-radius:0 7px 7px 0}
+  .seg .btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .filters input[type=date]{padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font:inherit}
+  .filters .ck{flex-direction:row;align-items:center;gap:6px;padding-bottom:8px;color:var(--ink)}
+  td.clip{max-width:380px;overflow:hidden;text-overflow:ellipsis}
+  td.num,th.num{text-align:right}
+  a.vl{color:var(--accent);font-weight:600;text-decoration:none}a.vl:hover{text-decoration:underline}
+  .blk{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
+  .cmt+.cmt{border-top:1px solid var(--line)}
+  .ck2{display:inline-block;font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:0 6px;margin-right:6px}
+  :root{--s1:#257de0;--s2:#f47230;--s3:#00b894;--s4:#f2a600;--s5:#ee7fac;--s6:#008a17;--s7:#6a4ce2;--s8:#ec4647;--good:#0aac23;--warn:#fbb315;--serious:#f18a59;--crit:#dc3c3d;--track:#eef1f4}
+  @media (prefers-color-scheme: dark){:root{--s1:#338ced;--s2:#e76624;--s3:#00a888;--s4:#d28e05;--s5:#e24d8b;--s6:#0aac23;--s7:#9887ef;--s8:#eb6263;--track:#223140}}
+  .dhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}.dhead h1{margin:0;font-size:20px}.dhead .note{margin-left:auto;padding:0}
+  .dsec{margin:18px 0 8px;font-size:12px;font-weight:650;color:var(--muted);letter-spacing:.04em}
+  .dtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .dt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+  .dt .dn{font-size:26px;font-weight:650;line-height:1.1}.dt .dl{font-size:12px;color:var(--ink);margin-top:2px}.dt .ds{font-size:11px;color:var(--muted)}
+  .dt.alert{border-color:var(--crit)}.dt.alert .dn{color:var(--crit)}
+  .clk{cursor:pointer}.dt.clk:hover,.hr.clk:hover,.cc.clk:hover .cs{background:var(--accent-soft)}.dt.clk:hover{border-color:var(--accent)}
+  .dgrid{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}
+  .dgrid .wide{grid-column:1/-1}
+  @media (max-width:900px){.dgrid{grid-template-columns:1fr}}
+  @media (min-width:1700px){.dgrid{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-flow:dense}}
+  .dcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px 14px;min-width:0}
+  .dcard h3{margin:0 0 10px;font-size:14px;font-weight:650}.dcard h3 span{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+  .hb{display:flex;flex-direction:column;gap:5px}
+  .hr{display:grid;grid-template-columns:minmax(110px,190px) 1fr auto;gap:10px;align-items:center;padding:2px 4px;border-radius:6px}
+  .hl{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ht{height:16px}.hf{height:16px;border-radius:0 4px 4px 0}
+  .hv{font-size:12px;color:var(--muted);min-width:70px;text-align:right;white-space:nowrap}
+  .ch{padding-left:46px}
+  .pa{position:relative}
+  .gl{position:absolute;left:-46px;right:0;border-top:1px solid var(--line);height:0}
+  .gl span{position:absolute;left:0;top:-8px;width:40px;text-align:right;font-size:11px;color:var(--muted);background:var(--panel)}
+  .cr,.cl{display:grid}
+  .cr{position:absolute;inset:0}
+  .cc{height:100%;display:flex;align-items:flex-end;justify-content:center}
+  .cs{width:min(24px,70%);display:flex;flex-direction:column-reverse;height:100%;justify-content:flex-start;border-radius:4px 4px 0 0}
+  .sg{border-top:2px solid var(--panel);flex:none}.sg:first-child{border-top:0}
+  .sg:last-child{border-radius:4px 4px 0 0}
+  .cx{text-align:center;font-size:11px;color:var(--muted);padding-top:6px}
+  .lg{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+  .tip{position:fixed;z-index:50;display:none;background:var(--nav);color:#fff;font-size:12px;padding:5px 9px;border-radius:6px;pointer-events:none;max-width:320px}
+  .prebar{display:flex;gap:10px;align-items:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;padding:7px 12px;margin-bottom:12px}
+  .att{display:flex;flex-direction:column}
+  .ar{display:flex;justify-content:space-between;gap:12px;padding:8px 6px;border-top:1px solid var(--line)}.ar:first-child{border-top:0}
+  .ar b{font-weight:650}.ar span{color:var(--muted);font-size:12px;display:block}
+  .mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+  .mini div{border:1px solid var(--line);border-radius:8px;padding:8px 10px}.mini b{display:block;font-size:18px}.mini span{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="brand" id="brand">Fort Lauderdale Fleet<small>Asset lookup</small></div>
+  <nav class="nav"><button id="navd">Dashboard</button><button id="navv">Vehicles</button><button id="navw">Work Orders</button></nav>
   <div class="searchwrap">
     <input id="q" type="search" autocomplete="off" placeholder="Type a vehicle number (V10060), plate, VIN, make, model, contact, notes..." aria-label="Search vehicles">
   </div>
@@ -128,6 +182,14 @@
     'Purchase Orders':'Purchase orders will be created and tracked here.'
   };
   var subtab='Services';
+  var WO=[], WOIDX={}, WOBY={}, WOLOADED=false, WOERR='', curMode='v';
+  var wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false}, wq='', wsort={k:'d',dir:-1}, wpage=0, wfiltered=[], mq='', cq='';
+  var EQN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false;
+  function isEq(a){return !/^V\d+$/i.test(a||'')}
+  function fmtD(iso){return iso?iso.slice(5,7)+'/'+iso.slice(8,10)+'/'+iso.slice(0,4):''}
+  function fmtDT(iso){if(!iso)return '';var h=+iso.slice(11,13),ap=h>=12?'PM':'AM';h=h%12||12;return fmtD(iso)+' '+h+':'+iso.slice(14,16)+' '+ap}
+  function fdays(d){return d==null?'':d.toFixed(1)}
+  function woText(w){return [w.x,w.cx,w.m].filter(Boolean).join(' | ')}
 
   function sec(title,inner){return '<fieldset><legend>'+esc(title)+'</legend>'+inner+'</fieldset>'}
   function grid(inner){return '<div class="grid">'+inner+'</div>'}
@@ -151,6 +213,42 @@
   function usage(v){ if(v.meter==null)return ''; if(v.meterType==='No Meter'&&!v.meter)return ''; return rnd(v.meter)+(v.meterType==='Engine Hours'?' hours':' miles') }
   function eqShown(v){ return v.milesEq&&Math.round(v.milesEq)!==Math.round(v.meter||0) }
   function toggle(){return '<label class="tog"><input type="checkbox" id="se"'+(showEmpty?' checked':'')+'> Show empty fields</label>'}
+
+  function mRows(v){
+    var toks=norm(mq).split(/\s+/).filter(Boolean);
+    var L=(WOBY[v.asset]||[]).filter(function(w){return toks.every(function(t){return w._h.indexOf(t)!==-1})});
+    if(!L.length) return '<tr><td colspan="9" class="empty">No work orders match.</td></tr>';
+    return L.map(function(w){
+      return '<tr data-wo="'+w.n+'"><td class="asset">'+w.n+'</td><td>'+badge(w.s)+'</td><td>'+fmtD(w.d)+'</td><td>'+fmtD(w.c)+'</td><td class="num">'+fdays(w.days)+'</td><td>'+esc(w.l)+'</td><td>'+esc(w.t)+'</td><td class="clip" title="'+esc(woText(w))+'">'+esc(woText(w))+'</td><td class="num">'+money(w.k)+'</td></tr>';
+    }).join('');
+  }
+  function bindWO(){
+    Array.prototype.forEach.call(app.querySelectorAll('tr[data-wo]'),function(el){
+      el.onclick=function(){location.hash='wo/'+el.getAttribute('data-wo')}
+    });
+    Array.prototype.forEach.call(app.querySelectorAll('a.vl[data-v]'),function(el){
+      el.onclick=function(e){e.stopPropagation();e.preventDefault();tab='Maintenance';mq='';cq='';location.hash=encodeURIComponent(el.getAttribute('data-v'))}
+    });
+  }
+  function stream(v){
+    var out=[];
+    if(v.comments) out.push({d:'',kind:'Collective Data',text:v.comments,meta:'Imported from Collective Data (no date or author)'});
+    (WOBY[v.asset]||[]).forEach(function(w){
+      var who=w.cb?' \u00b7 '+w.cb:'';
+      if(w.x) out.push({d:w.d,wo:w.n,kind:'Work order',text:w.x,meta:fmtD(w.d)+who});
+      if(w.cx) out.push({d:w.d,wo:w.n,kind:'Complaint',text:w.cx,meta:fmtD(w.d)+who});
+      if(w.m) out.push({d:w.d,wo:w.n,kind:'WO note',text:w.m,meta:fmtD(w.d)+who});
+    });
+    return out;
+  }
+  function cRows(v){
+    var toks=norm(cq).split(/\s+/).filter(Boolean);
+    var L=stream(v).filter(function(e){var h=norm(e.text+' '+e.kind+' '+(e.wo||''));return toks.every(function(t){return h.indexOf(t)!==-1})});
+    if(!L.length) return '<div class="empty">'+(cq?'Nothing matches.':'No comments yet.')+'</div>';
+    return L.map(function(e){
+      return '<div class="cmt"><div class="cmeta"><span class="ck2">'+esc(e.kind)+'</span>'+(e.wo?'<a class="vl" href="#wo/'+e.wo+'">WO '+e.wo+'</a> \u00b7 ':'')+esc(e.meta)+'</div><div>'+esc(e.text)+'</div></div>';
+    }).join('');
+  }
 
   var TABFN={
     'Overview':function(v){
@@ -186,15 +284,19 @@
       '</div></div>';
     },
     'Maintenance':function(v){
-      return sec('Work Order History',
-        '<div class="cols"><div>'+qf('Quick filter (complaint, WO #)')+
-          tbl(['Work Order','Status','Date','Description','Days Down','Total Cost'])+
-        '</div><div>'+
-          grid(fld('Status','','s6')+fld('Complaint','','s6')+fld('Open Date','','s3')+fld('Open Time','','s3')+fld('Close Date','','s3')+fld('Close Time','','s3')+
-            fld('System (for example, Wheels & Tire System)','','s6'))+
-          '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn" disabled>Go to Work Order</button><button class="btn" disabled>Work Order Summary</button></div>'+
-        '</div></div>')+
-        '<div class="note">Days Down will calculate from the open and close dates and times. Creating new work orders comes in the next phase.</div>';
+      if(!WOLOADED) return '<div class="empty">'+esc(WOERR||'Loading work orders...')+'</div>';
+      var L=WOBY[v.asset]||[];
+      if(!L.length) return '<div class="tabempty"><b>No work orders on file</b>This vehicle has no work orders in the report that was loaded.</div>';
+      var open=0,cost=0,dsum=0,dn=0;
+      L.forEach(function(w){cost+=w.k||0;if(w.s==='Closed'){dsum+=w.days;dn++}else open++});
+      return '<div class="stats">'+
+          stat('Work orders',L.length.toLocaleString(),open?open+' open now':'None open')+
+          stat('Total cost',money(cost),'Avg '+money(cost/L.length)+' per work order')+
+          stat('Average days down',dn?fdays(dsum/dn):'',dn?'Across '+dn+' closed':'')+
+          stat('Last opened',fmtD(L[0].d),L[0].x||'')+
+        '</div>'+
+        '<div class="qf"><input id="mf" value="'+esc(mq)+'" placeholder="Filter this vehicle\'s work orders (repair, technician, WO #, shop)" aria-label="Filter work orders"></div>'+
+        '<div class="tablewrap static"><table><thead><tr><th>Work Order</th><th>Status</th><th>Opened</th><th>Closed</th><th class="num">Days Down</th><th>Shop</th><th>Technician</th><th>Description</th><th class="num">Total Cost</th></tr></thead><tbody id="mbody">'+mRows(v)+'</tbody></table></div>';
     },
     'Part Usage':function(v){
       return qf('Quick filter (description, part, request ID)')+
@@ -220,8 +322,8 @@
     },
     'Comments/Notes':function(v){
       return sec('Comments','<div class="f s6"><label>Add a comment</label><div class="box tall" style="min-height:90px"></div></div>')+
-        qf('Search this vehicle\'s comments')+
-        '<div class="tablewrap static">'+(v.comments?'<div class="cmt"><div class="cmeta">Imported from Collective Data (no date or author)</div><div>'+esc(v.comments)+'</div></div>':'<div class="empty">No comments yet. Work order notes will show up here automatically with the date, WO number, and who wrote them.</div>')+'</div>';
+        '<div class="qf"><input id="cf" value="'+esc(cq)+'" placeholder="Search this vehicle\'s comments and work order notes" aria-label="Search comments"></div>'+
+        '<div class="tablewrap static" id="cbody">'+cRows(v)+'</div>';
     },
     'Scheduling':function(v){
       var subs=['Services','Warranty','Registration','Notification'];
@@ -247,7 +349,7 @@
   function money(n){return n==null?'':'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
   function meter(n){return n==null?'':Number(n).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})}
   function badge(s){
-    var c={'In Service':'b-ok','Out of Service':'b-bad','New Vehicle Prep':'b-info','Awaiting Pickup':'b-warn','Retired- Awaiting Disposal':'b-gray'}[s]||'b-info';
+    var c={'In Service':'b-ok','Out of Service':'b-bad','New Vehicle Prep':'b-info','Awaiting Pickup':'b-warn','Retired- Awaiting Disposal':'b-gray','Closed':'b-gray','Completed':'b-ok','Awaiting Shop':'b-warn','Awaiting Parts':'b-warn','Parts On Order':'b-warn','Parts Available':'b-warn','In Shop':'b-info','Vendor':'b-info'}[s]||'b-info';
     return s?'<span class="badge '+c+'">'+esc(s)+'</span>':'';
   }
   function uniq(arr){var o={};arr.forEach(function(x){if(x)o[x]=1});return Object.keys(o).sort(function(a,b){return a.localeCompare(b)})}
@@ -268,6 +370,8 @@
       if(f.division&&v.division!==f.division)return false;
       if(f.status&&v.status!==f.status)return false;
       if(f.supervisor&&v.supervisor!==f.supervisor)return false;
+      if(vpre&&!vpre.fn(v))return false;
+      if(!showEq&&!toks.length&&isEq(v.asset))return false;
       if(!toks.length)return true;
       var hay=norm([v.asset,v.year,v.make,v.model,v.dept,v.division,v.status,v.plate,v.vin,v.category,v.type,v.classCode,v.contact,v.supervisor,v.glCode,v.comments].join(' '));
       return toks.every(function(t){return hay.indexOf(t)!==-1});
@@ -287,9 +391,343 @@
     return null;
   }
 
+  function setMode(m){
+    document.getElementById('navd').className=m==='d'?'on':'';
+    document.getElementById('navv').className=m==='v'?'on':'';
+    document.getElementById('navw').className=m==='w'?'on':'';
+    if(m!==curMode){var was=curMode;curMode=m;
+      if((m==='w')!==(was==='w')){q.value=m==='w'?wq:query}
+      q.placeholder=m==='w'?'Search work orders: WO #, vehicle, repair, complaint, technician, shop...':'Type a vehicle number (V10060), plate, VIN, make, model, contact, notes...'}
+  }
   function render(){
     var id=decodeURIComponent(location.hash.slice(1));
+    var wm=/^wo(\/|$)/.test(id);
+    if(id==='dash'){setMode('d');renderDash();return}
+    setMode(wm?'w':'v');
+    if(wm){ if(id.length>3) renderWODetail(id.slice(3)); else renderWO(); return }
     if(id&&BY[id]) renderDetail(BY[id]); else renderList();
+  }
+
+  /* ---------------- Dashboard ---------------- */
+  var PERS={'30d':['Last 30 days',30],'90d':['Last 90 days',90],'12m':['Last 12 months',365],'ytd':['Year to date',0]};
+  var SHOPS=['Light Shop','Heavy Shop','Fire Shop','Small Engine','Road Call','Fleet'];
+  var SC=['var(--s1)','var(--s2)','var(--s3)','var(--s4)','var(--s5)','var(--s6)'];
+  var THEMES=[
+    ['Preventive maintenance',/\bpm\b|preventive|oil change|lube/],
+    ['Inspections',/inspection|\buec\b/],
+    ['Vehicle prep and decommission',/decommission|upfit|up-fit|install|build out|setup|set up|final|canc[ie]+ver|gps|plate|registration|destripe|remove spare/],
+    ['Billing, supplies, parts only',/billing only|shop supply|parts only|shop clean|no work performed|grease|propane|replacement blades/],
+    ['Suspension and steering',/steer|suspension|alignment|shock|strut|ball joint|tie rod|wheel bearing|\bcv\b|axle/],
+    ['Tires and wheels',/tire|flat\b|lug|\brim\b|wheel|tpms/],
+    ['Brakes',/brake|rotor|caliper/],
+    ['A/C and heat',/\ba\/?c\b|air cond|hvac|blowing (hot|warm)|no heat|heater/],
+    ['Battery and starting',/batter|jump|no start|won'?t start|starter|alternator|dead|charging/],
+    ['Engine and cooling',/check engine|\bcel\b|engine|misfire|stall|overheat|coolant|radiator|fuel|transmission|trans\b|shift/],
+    ['Leaks',/leak/],
+    ['Lights and electrical',/light|lamp|bulb|electric|wiper|horn|siren|radio|camera|wiring|fuse|computer|power/],
+    ['Body, glass, accident',/glass|windshield|door|mirror|body|dent|paint|bumper|window|accident|collision|damage|latch|seat/]
+  ];
+  function theme(w){var t=(w.x||'').toLowerCase();for(var i=0;i<THEMES.length;i++){if(THEMES[i][1].test(t))return THEMES[i][0]}return 'Other'}
+  function p2(n){return n<10?'0'+n:''+n}
+  function dayStr(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+  function perFrom(){var n=new Date();return dper==='ytd'?n.getFullYear()+'-01-01':dayStr(new Date(n.getTime()-PERS[dper][1]*864e5))}
+  function cm(n){n=Number(n)||0;var a=Math.abs(n);return a>=1e6?'$'+(n/1e6).toFixed(a>=1e7?1:2)+'M':a>=1e3?'$'+Math.round(n/1e3)+'K':'$'+Math.round(n)}
+  function cnt(n){return Number(n).toLocaleString('en-US')}
+  function reg(fn){gos.push(fn);return gos.length-1}
+  function goWO(label,fn,view){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort={k:'d',dir:-1};location.hash='wo'})}
+  function goV(label,fn){return reg(function(){vpre={label:label,fn:fn};f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();location.hash=''})}
+  function goAsset(a,t){return BY[a]?reg(function(){tab=t||'Maintenance';mq='';cq='';location.hash=encodeURIComponent(a)}):null}
+  function vdesc(a){var v=BY[a];return v?[v.year,v.make,v.model].filter(Boolean).join(' '):''}
+  function median(a){if(!a.length)return 0;a=a.slice().sort(function(x,y){return x-y});var m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
+  function niceStep(x){var p=Math.pow(10,Math.floor(Math.log(x||1)/Math.LN10)),r=x/p,n=r<=1?1:r<=2?2:r<=2.5?2.5:r<=5?5:10;return n*p}
+
+  function dtile(label,val,sub,go,cls){return '<div class="dt'+(cls?' '+cls:'')+(go!=null?' clk':'')+'"'+(go!=null?' data-go="'+go+'" role="button"':'')+'><div class="dn">'+val+'</div><div class="dl">'+esc(label)+'</div>'+(sub?'<div class="ds">'+esc(sub)+'</div>':'')+'</div>'}
+  function card(title,sub,inner,cls){return '<section class="dcard'+(cls?' '+cls:'')+'"><h3>'+esc(title)+(sub?'<span>'+esc(sub)+'</span>':'')+'</h3>'+inner+'</section>'}
+  function hbars(items){
+    if(!items.length)return '<div class="note">Nothing to show for this period.</div>';
+    var max=0;items.forEach(function(i){if(i.v>max)max=i.v});
+    return '<div class="hb">'+items.map(function(i){
+      var w=max?Math.max(i.v/max*100,i.v>0?1.5:0):0;
+      return '<div class="hr'+(i.go!=null?' clk':'')+'"'+(i.go!=null?' data-go="'+i.go+'"':'')+(i.t?' data-tip="'+esc(i.t)+'"':'')+'><div class="hl">'+esc(i.l)+'</div><div class="ht"><div class="hf" style="width:'+w+'%;background:'+(i.c||'var(--s1)')+'"></div></div><div class="hv">'+esc(i.vt)+'</div></div>';
+    }).join('')+'</div>';
+  }
+  function cols(cats,series,o){
+    o=o||{};var fmt=o.fmt||cnt;
+    var tot=cats.map(function(c,i){return series.reduce(function(a,s){return a+(s.v[i]||0)},0)});
+    var mx=Math.max.apply(null,tot.concat([1])),step=niceStep(mx/4),top=Math.ceil(mx/step-1e-9)*step,grid='';
+    for(var t=0;t<=top+1e-9;t+=step){grid+='<div class="gl" style="bottom:'+(t/top*100)+'%"><span>'+fmt(t)+'</span></div>'}
+    var n=cats.length,tpl='grid-template-columns:repeat('+n+',1fr)';
+    var cs=cats.map(function(c,i){
+      var segs=series.map(function(s){var v=s.v[i]||0;if(!v)return '';return '<div class="sg" style="height:'+(v/top*100)+'%;background:'+s.c+'" data-tip="'+esc(c.t+' · '+s.n+': '+fmt(v))+'"></div>'}).join('');
+      var g=o.go&&o.go[i]!=null?o.go[i]:null;
+      return '<div class="cc'+(g!=null?' clk':'')+'"'+(g!=null?' data-go="'+g+'"':'')+'><div class="cs">'+segs+'</div></div>';
+    }).join('');
+    var lbl=cats.map(function(c){return '<div class="cx">'+esc(c.l)+'</div>'}).join('');
+    var lg=series.length>1||o.legend?'<div class="lg">'+series.map(function(s){return '<span><i style="background:'+s.c+'"></i>'+esc(s.n)+'</span>'}).join('')+'</div>':'';
+    return '<div class="ch"><div class="pa" style="height:'+(o.h||170)+'px">'+grid+'<div class="cr" style="'+tpl+'">'+cs+'</div></div><div class="cl" style="'+tpl+'">'+lbl+'</div></div>'+lg;
+  }
+
+  function renderDash(){
+    document.title='Dashboard | Fleet';
+    if(!WOLOADED){app.innerHTML='<div class="empty">'+esc(WOERR||'Loading work orders...')+'</div>';return}
+    gos=[];
+    var WOD=WO.filter(function(w){return !isEq(w.a)}),DV=DATA.filter(function(v){return !isEq(v.asset)});
+    var from=perFrom(),nowD=new Date(),today=dayStr(nowD),yest=dayStr(new Date(nowD.getTime()-864e5));
+    var perName=PERS[dper][0];
+    var open=[],openBy={},per=[],closedPer=[],perCost=0;
+    WOD.forEach(function(w){
+      if(w.s!=='Closed'){open.push(w);openBy[w.a]=(openBy[w.a]||0)+1}
+      if(w.d.slice(0,10)>=from){per.push(w);perCost+=w.k||0;w._th=theme(w)}
+      if(w.c&&w.c.slice(0,10)>=from)closedPer.push(w);
+    });
+    var active=DV.filter(function(v){return !/^Retired/.test(v.status)});
+    function inPer(w){return w.d.slice(0,10)>=from}
+    function isOpenW(w){return w.s!=='Closed'}
+    function ageDays(w){return w.days}
+
+    /* right now */
+    var oos=DV.filter(function(v){return v.status==='Out of Service'});
+    var oosNoWO=oos.filter(function(v){return !openBy[v.asset]});
+    var waiting=open.filter(function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'});
+    var parts=open.filter(function(w){return w.s==='Parts Available'});
+    var old30=open.filter(function(w){return ageDays(w)>30});
+    var openToday=WOD.filter(function(w){return w.d.slice(0,10)===today}),closedToday=WOD.filter(function(w){return w.c&&w.c.slice(0,10)===today}),openYest=WOD.filter(function(w){return w.d.slice(0,10)===yest});
+    var nVeh=Object.keys(openBy).length;
+    var now=
+      dtile('Open work orders',cnt(open.length),cnt(nVeh)+' vehicles',goWO('open work orders',isOpenW,'Open'))+
+      dtile('Out of Service vehicles',cnt(oos.length),oosNoWO.length+' with no open work order',goV('vehicles marked Out of Service',function(v){return v.status==='Out of Service'}),oos.length?'alert':'')+
+      dtile('Waiting on parts',cnt(waiting.length),'Awaiting parts or on order',goWO('work orders waiting on parts',function(w){return w.s==='Awaiting Parts'||w.s==='Parts On Order'},'Open'))+
+      dtile('Parts available',cnt(parts.length),'Ready to schedule',goWO('work orders with parts available',function(w){return w.s==='Parts Available'},'Open'))+
+      dtile('Open over 30 days',cnt(old30.length),'Review for a stuck status',goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'),old30.length?'alert':'')+
+      dtile('Opened today',cnt(openToday.length),'',goWO('work orders opened today',function(w){return w.d.slice(0,10)===today}))+
+      dtile('Closed today',cnt(closedToday.length),'',goWO('work orders closed today',function(w){return w.c&&w.c.slice(0,10)===today}))+
+      dtile('Opened yesterday',cnt(openYest.length),'',goWO('work orders opened yesterday',function(w){return w.d.slice(0,10)===yest}));
+
+    /* period tiles */
+    var dd=closedPer.map(function(w){return w.days});
+    var dsum=dd.reduce(function(a,b){return a+b},0);
+    var rc=per.filter(function(w){return w.rc}).length;
+    var pm=per.filter(function(w){return w._th==='Preventive maintenance'}).length;
+    var pt=
+      dtile('Maintenance cost',cm(perCost),cnt(per.length)+' work orders opened',goWO(perName.toLowerCase()+', all work orders',inPer))+
+      dtile('Average cost per work order',per.length?money(perCost/per.length).replace(/\.\d\d$/,''):'',per.length?'Median '+money(median(per.map(function(w){return w.k||0}))).replace(/\.\d\d$/,''):'')+
+      dtile('Average days down',dd.length?fdays(dsum/dd.length):'—',dd.length?'Median '+fdays(median(dd))+' · '+cnt(dd.length)+' closed':'',goWO('work orders closed, '+perName.toLowerCase(),function(w){return w.c&&w.c.slice(0,10)>=from}))+
+      dtile('Road calls',cnt(rc),per.length?Math.round(rc/per.length*100)+'% of work orders':'',goWO('road calls, '+perName.toLowerCase(),function(w){return w.rc&&inPer(w)}))+
+      dtile('Preventive maintenance',cnt(pm),per.length?Math.round(pm/per.length*100)+'% of work orders':'',goWO('preventive maintenance, '+perName.toLowerCase(),function(w){return inPer(w)&&w._th==='Preventive maintenance'}));
+
+    /* open by status and aging */
+    var sc={};open.forEach(function(w){sc[w.s]=(sc[w.s]||0)+1});
+    var stItems=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).map(function(k){return {l:k,v:sc[k],vt:cnt(sc[k]),go:goWO('open work orders with status '+k,function(w){return w.s===k},'Open')}});
+    var AG=[['0 to 2 days',0,2,'var(--good)'],['3 to 7 days',2,7,'var(--warn)'],['8 to 30 days',7,30,'var(--serious)'],['Over 30 days',30,1e9,'var(--crit)']];
+    var agItems=AG.map(function(b){var lo=b[1],hi=b[2];var n=open.filter(function(w){return w.days>lo&&w.days<=hi||(lo===0&&w.days<=hi)}).length;return {l:b[0],v:n,vt:cnt(n),c:b[3],go:goWO('open work orders, '+b[0],function(w){return isOpenW(w)&&(lo===0?w.days<=hi:w.days>lo&&w.days<=hi)},'Open')}});
+
+    /* months */
+    var months=[];for(var i=11;i>=0;i--){var d=new Date(nowD.getFullYear(),nowD.getMonth()-i,1);months.push({k:d.getFullYear()+'-'+p2(d.getMonth()+1),l:d.toLocaleString('en-US',{month:'short'})+(d.getMonth()===0||i===11?' ’'+String(d.getFullYear()).slice(2):''),t:d.toLocaleString('en-US',{month:'long',year:'numeric'})+(i===0?' (to date)':'')})}
+    var mi={};months.forEach(function(m,i){mi[m.k]=i});
+    var cost=SHOPS.map(function(){return months.map(function(){return 0})}),other=months.map(function(){return 0}),opened=months.map(function(){return 0}),roads=months.map(function(){return 0});
+    WOD.forEach(function(w){var i=mi[w.d.slice(0,7)];if(i==null)return;var si=SHOPS.indexOf(w.l);if(si<0)other[i]+=w.k||0;else cost[si][i]+=w.k||0;opened[i]++;if(w.rc)roads[i]++});
+    var mser=SHOPS.map(function(n,i){return {n:n,c:SC[i],v:cost[i]}});mser.push({n:'Other',c:'var(--s7)',v:other});
+    var mgo=months.map(function(m){return goWO('work orders opened in '+m.t,function(w){return w.d.slice(0,7)===m.k})});
+    var rgo=months.map(function(m){return goWO('road calls in '+m.t,function(w){return w.rc&&w.d.slice(0,7)===m.k})});
+
+    /* shops, depts, vehicles, themes */
+    var shop={};closedPer.forEach(function(w){var k=w.l||'Not listed';(shop[k]=shop[k]||[]).push(w.days)});
+    var shopItems=Object.keys(shop).map(function(k){var a=shop[k];return {l:k,v:a.reduce(function(x,y){return x+y},0)/a.length,vt:fdays(a.reduce(function(x,y){return x+y},0)/a.length)+' days · '+cnt(a.length),t:k+': median '+fdays(median(a))+' days',go:goWO(k+', closed '+perName.toLowerCase(),function(w){return (w.l||'Not listed')===k&&w.c&&w.c.slice(0,10)>=from})}}).sort(function(a,b){return b.v-a.v});
+    var dep={},vc={};active.forEach(function(v){vc[v.dept]=(vc[v.dept]||0)+1});
+    per.forEach(function(w){var k=BY[w.a]?BY[w.a].dept:'Not in asset list';var o=dep[k]||(dep[k]={c:0,n:0});o.c+=w.k||0;o.n++});
+    var depItems=Object.keys(dep).map(function(k){return {l:k,v:dep[k].c,vt:cm(dep[k].c),t:k+': '+cnt(dep[k].n)+' work orders',go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&(BY[w.a]?BY[w.a].dept:'Not in asset list')===k})}}).sort(function(a,b){return b.v-a.v});
+    var depPV=Object.keys(dep).filter(function(k){return vc[k]>=10}).map(function(k){var pv=dep[k].c/vc[k];return {l:k,v:pv,vt:'$'+cnt(Math.round(pv)),t:k+': '+cm(dep[k].c)+' across '+cnt(vc[k])+' active vehicles',go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&(BY[w.a]?BY[w.a].dept:'')===k})}}).sort(function(a,b){return b.v-a.v});
+    var va={};per.forEach(function(w){if(!w.a)return;var o=va[w.a]||(va[w.a]={c:0,n:0});o.c+=w.k||0;o.n++});
+    var topV=Object.keys(va).filter(function(a){return BY[a]}).sort(function(a,b){return va[b].c-va[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:va[a].c,vt:cm(va[a].c),t:cnt(va[a].n)+' work orders',go:goAsset(a)}});
+    var th={};per.forEach(function(w){var o=th[w._th]||(th[w._th]={n:0,c:0});o.n++;o.c+=w.k||0});
+    var thItems=Object.keys(th).sort(function(a,b){if(a==='Other')return 1;if(b==='Other')return -1;return th[b].n-th[a].n}).map(function(k){return {l:k,v:th[k].n,vt:cnt(th[k].n)+' · '+cm(th[k].c),go:goWO(k+', '+perName.toLowerCase(),function(w){return inPer(w)&&w._th===k})}});
+    var cut90=dayStr(new Date(nowD.getTime()-90*864e5)),ff={};
+    WOD.forEach(function(w){if(!w.a||w.d.slice(0,10)<cut90)return;var o=ff[w.a]||(ff[w.a]={n:0,c:0});o.n++;o.c+=w.k||0});
+    var ffItems=Object.keys(ff).filter(function(a){return BY[a]&&ff[a].n>=3}).sort(function(a,b){return ff[b].n-ff[a].n||ff[b].c-ff[a].c}).slice(0,10).map(function(a){return {l:a+(vdesc(a)?' · '+vdesc(a):''),v:ff[a].n,vt:ff[a].n+' · '+cm(ff[a].c),go:goAsset(a)}});
+    var ffTotal=Object.keys(ff).filter(function(a){return BY[a]&&ff[a].n>=3}).length;
+
+    /* fleet */
+    var stc={};DV.forEach(function(v){stc[v.status]=(stc[v.status]||0)+1});
+    var fstItems=Object.keys(stc).sort(function(a,b){return stc[b]-stc[a]}).map(function(k){return {l:k,v:stc[k],vt:cnt(stc[k]),c:k==='Out of Service'?'var(--crit)':'var(--s1)',go:goV('vehicles with status '+k,function(v){return v.status===k})}});
+    var cat={};active.forEach(function(v){cat[v.category]=(cat[v.category]||0)+1});
+    var catItems=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a]}).slice(0,10).map(function(k){return {l:k||'(none)',v:cat[k],vt:cnt(cat[k]),go:goV('active vehicles in '+(k||'(no category)'),function(v){return !/^Retired/.test(v.status)&&v.category===k})}});
+    var yr=nowD.getFullYear(),ages=[],AB=[['0 to 2',0,2],['3 to 5',3,5],['6 to 8',6,8],['9 to 11',9,11],['12 to 14',12,14],['15+',15,99]],ab=AB.map(function(){return 0}),asum=0,an=0;
+    active.forEach(function(v){var y=parseInt(v.year,10);if(!y)return;var a=yr-y;asum+=a;an++;for(var i=0;i<AB.length;i++){if(a>=AB[i][1]&&a<=AB[i][2]){ab[i]++;break}}});
+    var ageGo=AB.map(function(b){return goV('active vehicles aged '+b[0]+' years',function(v){var y=parseInt(v.year,10);if(!y||/^Retired/.test(v.status))return false;var a=yr-y;return a>=b[1]&&a<=b[2]})});
+    var dpc={};active.forEach(function(v){dpc[v.dept]=(dpc[v.dept]||0)+1});
+    var dpItems=Object.keys(dpc).sort(function(a,b){return dpc[b]-dpc[a]}).map(function(k){return {l:k||'(none)',v:dpc[k],vt:cnt(dpc[k]),go:goV('active vehicles in '+k,function(v){return !/^Retired/.test(v.status)&&v.dept===k})}});
+
+    /* replacement */
+    var ro=[],ov={c:0,n:0},nx={c:0,n:0},byY={},esc$=0;
+    active.forEach(function(v){esc$+=v.annualEscrow||0;if(!v.projDate||!v.projCost)return;var key=v.projDate.slice(6)+'-'+v.projDate.slice(0,2)+'-'+v.projDate.slice(3,5);
+      var limit=dayStr(new Date(nowD.getTime()+365*864e5));
+      if(key<today){ov.c+=v.projCost;ov.n++}else{var y=key.slice(0,4);(byY[y]=byY[y]||{c:0,n:0});byY[y].c+=v.projCost;byY[y].n++;if(key<=limit){nx.c+=v.projCost;nx.n++}}});
+    var ycats=[{l:'Overdue',t:'Overdue for replacement'}],yo=[ov.c],ys=[0],ycnt=[ov.n];
+    Object.keys(byY).sort().forEach(function(y){if(+y>yr+6)return;ycats.push({l:y,t:'Replacements projected in '+y});yo.push(0);ys.push(byY[y].c);ycnt.push(byY[y].n)});
+    var ovGo=goV('vehicles past their projected replacement date',function(v){if(/^Retired/.test(v.status)||!v.projDate||!v.projCost)return false;return v.projDate.slice(6)+'-'+v.projDate.slice(0,2)+'-'+v.projDate.slice(3,5)<today});
+
+    /* needs attention */
+    var noWO12=active.filter(function(v){return v.status==='In Service'&&!(WOBY[v.asset]||[]).some(function(w){return w.d.slice(0,10)>=dayStr(new Date(nowD.getTime()-365*864e5))})});
+    var zeroMi=active.filter(function(v){return v.meterType!=='No Meter'&&!v.meter});
+    var zeroCost=WOD.filter(function(w){return w.s==='Closed'&&!w.k});
+    var orphan=WOD.filter(function(w){return !BY[w.a]});
+    function ar(label,sub,n,go){return '<div class="ar'+(go!=null?' clk':'')+'"'+(go!=null?' data-go="'+go+'"':'')+'><div><b>'+esc(label)+'</b><span>'+esc(sub)+'</span></div><b>'+cnt(n)+'</b></div>'}
+    var oosSet={};oosNoWO.forEach(function(v){oosSet[v.asset]=1});
+    var nwSet={};noWO12.forEach(function(v){nwSet[v.asset]=1});
+    var zmSet={};zeroMi.forEach(function(v){zmSet[v.asset]=1});
+    var att=
+      ar('Out of Service with no open work order','The vehicle is marked down but nothing is open on it',oosNoWO.length,goV('Out of Service vehicles with no open work order',function(v){return !!oosSet[v.asset]}))+
+      ar('Open more than 30 days','Open work orders to review for a stuck status',old30.length,goWO('open work orders older than 30 days',function(w){return isOpenW(w)&&ageDays(w)>30},'Open'))+
+      ar('In service, no work order in 12 months','Could be unused, or work not getting recorded',noWO12.length,goV('in service vehicles with no work order in 12 months',function(v){return !!nwSet[v.asset]}))+
+      ar('Mileage is zero or blank','Active vehicles that should have a meter reading',zeroMi.length,goV('active vehicles with zero or blank mileage',function(v){return !!zmSet[v.asset]}))+
+      ar('Closed with $0 total cost','Closed work orders with no cost recorded',zeroCost.length,goWO('closed work orders with $0 cost',function(w){return w.s==='Closed'&&!w.k}))+
+      ar('Vehicle not in the asset list','Work orders on assets that are not in the current vehicle list',orphan.length,goWO('work orders on assets not in the asset list',function(w){return !BY[w.a]}));
+
+    var sel='<select id="dper">'+Object.keys(PERS).map(function(k){return '<option value="'+k+'"'+(k===dper?' selected':'')+'>'+PERS[k][0]+'</option>'}).join('')+'</select>';
+    app.innerHTML=
+      '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label><span class="note">Click any number or bar to see the work orders or vehicles behind it.</span></div>'+
+      '<div class="dsec">RIGHT NOW</div><div class="dtiles">'+now+'</div>'+
+      '<div class="dsec">'+esc(perName.toUpperCase())+'</div><div class="dtiles">'+pt+'</div>'+
+      '<div class="dgrid">'+
+        card('Open work orders by status','Click a status to open the list',hbars(stItems))+
+        card('How long open work orders have been open','Days since opened',hbars(agItems))+
+        card('Maintenance cost by month and shop','Last 12 months, by date opened. Click a month for its work orders.',cols(months,mser,{fmt:cm,go:mgo,h:190}),'wide')+
+        card('Work orders opened per month','',cols(months,[{n:'Work orders',c:'var(--s1)',v:opened}],{go:mgo}))+
+        card('Road calls per month','',cols(months,[{n:'Road calls',c:'var(--s2)',v:roads}],{go:rgo}))+
+        card('Average days down by shop','Closed work orders, '+perName.toLowerCase()+' (days · count)',hbars(shopItems))+
+        card('What the work orders are for','Matched on keywords in the repair description, one group per work order. '+perName+' (count · cost)',hbars(thItems))+
+        card('Top 10 vehicles by maintenance cost',perName,hbars(topV))+
+        card('Most work orders, last 90 days',ffTotal+' vehicles had 3 or more (count · cost)',hbars(ffItems))+
+        card('Maintenance cost by department',perName,hbars(depItems))+
+        card('Maintenance cost per active vehicle','Departments with 10 or more vehicles. '+perName,hbars(depPV))+
+      '</div>'+
+      '<div class="dsec">THE FLEET</div>'+
+      '<div class="dgrid">'+
+        card('Vehicles by status','All '+cnt(DV.length)+' assets',hbars(fstItems))+
+        card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years by model year',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
+        card('Active vehicles by category','Top 10',hbars(catItems))+
+        card('Active vehicles by department','',hbars(dpItems))+
+        card('Replacement outlook','Projected cost by year from the life cycle data',
+          '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
+          cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm}),'wide')+
+        card('Needs attention','Data and status items worth a look',  '<div class="att">'+att+'</div>','wide')+
+      '</div>'+
+      '<div class="note" style="margin-top:12px">Fleet equipment and non-targeted items are left out. Cost and counts use the date a work order was opened. The work order history in this export starts in late November 2025, so comparisons to earlier periods are not available yet.</div>';
+    document.getElementById('dper').onchange=function(){dper=this.value;renderDash()};
+    window.scrollTo(0,0);
+  }
+
+  function cmpWO(a,b){
+    var k=wsort.k,r;
+    if(k==='n'||k==='k'||k==='days'||k==='h') r=(a[k]||0)-(b[k]||0);
+    else if(k==='a') r=num(a.a)-num(b.a);
+    else r=String(a[k]||'').localeCompare(String(b[k]||''));
+    if(r===0) r=a.n-b.n;
+    return r*wsort.dir;
+  }
+  function applyWO(){
+    var toks=norm(wq).split(/\s+/).filter(Boolean);
+    wfiltered=WO.filter(function(w){
+      if(wf.view==='Open'&&w.s==='Closed')return false;
+      if(wf.view==='Closed'&&w.s!=='Closed')return false;
+      if(wf.status&&w.s!==wf.status)return false;
+      if(wf.loc&&w.l!==wf.loc)return false;
+      if(wf.tech&&w.t!==wf.tech)return false;
+      if(wf.road&&!w.rc)return false;
+      if(wf.from&&w.d.slice(0,10)<wf.from)return false;
+      if(wf.to&&w.d.slice(0,10)>wf.to)return false;
+      if(wf.pre&&!wf.pre.fn(w))return false;
+      if(!wf.eq&&!toks.length&&isEq(w.a))return false;
+      for(var i=0;i<toks.length;i++){if(w._h.indexOf(toks[i])===-1)return false}
+      return true;
+    });
+    wfiltered.sort(cmpWO);
+  }
+  function renderWO(){
+    document.title='Work Orders | Fleet';
+    if(!WOLOADED){app.innerHTML='<div class="empty">'+esc(WOERR||'Loading work orders...')+'</div>';return}
+    applyWO();
+    var open=0,cost=0,dsum=0,dn=0,rc=0;
+    wfiltered.forEach(function(w){cost+=w.k||0;if(w.rc)rc++;if(w.s==='Closed'){dsum+=w.days;dn++}else open++});
+    var base=WO.filter(function(w){return wf.view==='All'||(wf.view==='Open'?w.s!=='Closed':w.s==='Closed')});
+    function opts(list,sel,all){return '<option value="">'+all+'</option>'+list.map(function(x){return '<option'+(x===sel?' selected':'')+' value="'+esc(x)+'">'+esc(x)+'</option>'}).join('')}
+    var pages=Math.max(1,Math.ceil(wfiltered.length/PAGE)); if(wpage>=pages)wpage=pages-1;
+    var slice=wfiltered.slice(wpage*PAGE,wpage*PAGE+PAGE);
+    function th(k,l,c){return '<th'+(c?' class="'+c+'"':'')+' data-k="'+k+'">'+l+(wsort.k===k?' <span class="arr">'+(wsort.dir>0?'&#9650;':'&#9660;')+'</span>':'')+'</th>'}
+    var rows=slice.map(function(w){
+      var vcell=BY[w.a]?'<a class="vl" data-v="'+esc(w.a)+'" href="#'+esc(w.a)+'">'+esc(w.a)+'</a>':esc(w.a||'(none)');
+      var vd=BY[w.a]?[BY[w.a].year,BY[w.a].make,BY[w.a].model].filter(Boolean).join(' '):(w.ad||'');
+      return '<tr data-wo="'+w.n+'"><td class="asset">'+w.n+'</td><td>'+vcell+'</td><td class="clip" style="max-width:220px">'+esc(vd)+'</td><td>'+fmtD(w.d)+'</td><td>'+fmtD(w.c)+'</td><td class="num">'+fdays(w.days)+'</td><td>'+badge(w.s)+'</td><td>'+esc(w.l)+'</td><td>'+esc(w.t)+'</td><td class="clip" title="'+esc(woText(w))+'">'+esc(woText(w))+'</td><td class="num">'+money(w.k)+'</td></tr>';
+    }).join('');
+    app.innerHTML=
+      (wf.pre?'<div class="prebar">Showing <b>'+esc(wf.pre.label)+'</b><button class="btn" id="wpc">Remove this filter</button></div>':'')+
+      '<div class="tiles">'+
+        '<div class="tile"><div class="n">'+wfiltered.length.toLocaleString()+'</div><div class="l">Work orders shown</div></div>'+
+        '<div class="tile"><div class="n">'+open.toLocaleString()+'</div><div class="l">Open</div></div>'+
+        '<div class="tile"><div class="n">'+money(cost).replace(/\.\d\d$/,'')+'</div><div class="l">Total cost</div></div>'+
+        '<div class="tile"><div class="n">'+(dn?fdays(dsum/dn):'&mdash;')+'</div><div class="l">Avg days down (closed)</div></div>'+
+        '<div class="tile"><div class="n">'+rc.toLocaleString()+'</div><div class="l">Road calls</div></div>'+
+      '</div>'+
+      '<div class="filters">'+
+        '<div class="seg">'+['Open','Closed','All'].map(function(x){return '<button class="btn'+(wf.view===x?' on':'')+'" data-view="'+x+'">'+x+'</button>'}).join('')+'</div>'+
+        '<label>Status<select id="ws">'+opts(uniq(base.map(function(w){return w.s})),wf.status,'All statuses')+'</select></label>'+
+        '<label>Shop<select id="wl">'+opts(uniq(WO.map(function(w){return w.l})),wf.loc,'All shops')+'</select></label>'+
+        '<label>Technician<select id="wt">'+opts(uniq(WO.map(function(w){return w.t})),wf.tech,'All technicians')+'</select></label>'+
+        '<label>Opened from<input type="date" id="wfr" value="'+esc(wf.from)+'"></label>'+
+        '<label>Opened to<input type="date" id="wto" value="'+esc(wf.to)+'"></label>'+
+        '<label class="ck"><input type="checkbox" id="wrc"'+(wf.road?' checked':'')+'> Road calls only</label>'+
+        '<label class="ck"><input type="checkbox" id="weq"'+(wf.eq?' checked':'')+'> Include fleet equipment and non-targeted</label>'+
+        '<button class="btn" id="wclr">Clear filters</button>'+
+      '</div>'+
+      '<div class="tablewrap">'+(wfiltered.length?
+        '<table><thead><tr>'+th('n','WO #')+th('a','Vehicle')+'<th>Vehicle description</th>'+th('d','Opened')+th('c','Closed')+th('days','Days Down','num')+th('s','Status')+th('l','Shop')+th('t','Technician')+th('x','Description')+th('k','Total Cost','num')+'</tr></thead><tbody>'+rows+'</tbody></table>'
+        :'<div class="empty">No work orders match.</div>')+'</div>'+
+      '<div class="pager"><span>'+(wfiltered.length?('Showing '+(wpage*PAGE+1)+' to '+Math.min(wfiltered.length,wpage*PAGE+PAGE)+' of '+wfiltered.length.toLocaleString()):'')+'</span>'+
+        '<span><button class="btn" id="wpp"'+(wpage===0?' disabled':'')+'>Previous</button> <button class="btn" id="wpn"'+(wpage>=pages-1?' disabled':'')+'>Next</button></span></div>';
+    function on(id,fn){document.getElementById(id).onchange=fn}
+    on('ws',function(){wf.status=this.value;wpage=0;renderWO()});
+    on('wl',function(){wf.loc=this.value;wpage=0;renderWO()});
+    on('wt',function(){wf.tech=this.value;wpage=0;renderWO()});
+    on('wfr',function(){wf.from=this.value;wpage=0;renderWO()});
+    on('wto',function(){wf.to=this.value;wpage=0;renderWO()});
+    on('weq',function(){wf.eq=this.checked;wpage=0;renderWO()});
+    on('wrc',function(){wf.road=this.checked;wpage=0;renderWO()});
+    var wpc=document.getElementById('wpc');if(wpc)wpc.onclick=function(){wf.pre=null;wpage=0;renderWO()};
+    document.getElementById('wclr').onclick=function(){wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false};wq='';q.value='';wpage=0;renderWO()};
+    document.getElementById('wpp').onclick=function(){wpage--;renderWO();window.scrollTo(0,0)};
+    document.getElementById('wpn').onclick=function(){wpage++;renderWO();window.scrollTo(0,0)};
+    Array.prototype.forEach.call(app.querySelectorAll('button[data-view]'),function(el){
+      el.onclick=function(){wf.view=el.getAttribute('data-view');wf.status='';wpage=0;renderWO()}
+    });
+    Array.prototype.forEach.call(app.querySelectorAll('th[data-k]'),function(el){
+      el.onclick=function(){var k=el.getAttribute('data-k');if(wsort.k===k)wsort.dir=-wsort.dir;else{wsort.k=k;wsort.dir=(k==='n'||k==='d'||k==='c'||k==='k'||k==='days')?-1:1}renderWO()}
+    });
+    bindWO();
+  }
+  function renderWODetail(id){
+    var w=WOIDX[id];
+    if(!WOLOADED){app.innerHTML='<div class="empty">'+esc(WOERR||'Loading work orders...')+'</div>';return}
+    if(!w){app.innerHTML='<div class="crumbs"><button class="btn" id="wb">&larr; Work orders</button></div><div class="empty">Work order '+esc(id)+' was not found.</div>';document.getElementById('wb').onclick=function(){location.hash='wo'};return}
+    document.title='WO '+w.n+' | Fleet';
+    var v=BY[w.a];
+    var vd=v?[v.year,v.make,v.model].filter(Boolean).join(' '):(w.ad||'');
+    app.innerHTML=
+      '<div class="crumbs"><button class="btn" id="wb">&larr; Work orders</button>'+(v?'<button class="btn" id="wv">Vehicle '+esc(w.a)+' &rsaquo;</button>':'')+'</div>'+
+      '<div class="titlebar"><h1>WO '+w.n+'</h1><span class="sub">'+esc(w.a)+(vd?' \u00b7 '+esc(vd):'')+'</span>'+badge(w.s)+(w.ss?'<span class="badge b-gray">'+esc(w.ss)+'</span>':'')+(w.rc?'<span class="badge b-bad">Road call</span>':'')+'<span style="margin-left:auto">'+toggle()+'</span></div>'+
+      '<div class="stats">'+stat('Days down',fdays(w.days),w.c?'Closed '+fmtD(w.c):'Open now')+stat('Total cost',money(w.k),w.b!=null?'Billable '+money(w.b):'')+stat('Labor hours',w.h!=null?String(w.h):'')+stat(v&&v.meterType==='Engine Hours'?'Meter in (hours)':'Meter in',w.mi!=null?rnd(w.mi):'')+'</div>'+
+      '<section class="grp"><h3>Repair description</h3><div class="blk">'+esc(w.x||'No description')+'</div></section>'+
+      (w.cx?'<section class="grp"><h3>Complaint</h3><div class="blk">'+esc(w.cx)+'</div></section>':'')+
+      (w.m?'<section class="grp"><h3>Comments</h3><div class="blk">'+esc(w.m)+'</div></section>':'')+
+      '<div class="cols2"><div>'+
+        grp('Where and who',[kv('Shop',w.l),kv('Lead technician',w.t),kv('Substatus',w.ss),kv('Contact info',w.ct),kv('Created by',w.cb)])+
+      '</div><div>'+
+        grp('Timeline',[kv('Opened',fmtDT(w.d)),kv('Closed',fmtDT(w.c)),kv('Days down',fdays(w.days)),kv('Turn time (as reported)',w.tt!=null?String(w.tt):'')])+
+        grp('Quality check and pickup',[kv('Quality check performed',w.qc?'Yes':'No'),kv('QC performed by',w.qb),kv('Pickup email sent',w.pe?'Yes':'No')])+
+      '</div></div>';
+    document.getElementById('wb').onclick=function(){location.hash='wo'};
+    var wv=document.getElementById('wv'); if(wv)wv.onclick=function(){tab='Maintenance';mq='';cq='';location.hash=encodeURIComponent(w.a)};
+    var se=document.getElementById('se'); if(se)se.onchange=function(){showEmpty=se.checked;renderWODetail(id)};
+    window.scrollTo(0,0);
   }
 
   function renderList(){
@@ -308,8 +746,9 @@
       return '<tr data-id="'+esc(v.asset)+'"><td class="asset">'+esc(v.asset)+'</td><td>'+esc(v.year)+'</td><td>'+esc(v.make)+'</td><td>'+esc(v.model)+'</td><td>'+esc(v.dept)+'</td><td>'+esc(v.division)+'</td><td>'+esc(v.contact)+'</td><td>'+badge(v.status)+'</td></tr>';
     }).join('');
     app.innerHTML=
+      (vpre?'<div class="prebar">Showing <b>'+esc(vpre.label)+'</b><button class="btn" id="vpc">Show all vehicles</button></div>':'')+
       '<div class="tiles">'+
-        '<div class="tile"><div class="n">'+filtered.length.toLocaleString()+'</div><div class="l">Vehicles shown (of '+DATA.length.toLocaleString()+')</div></div>'+
+        '<div class="tile"><div class="n">'+filtered.length.toLocaleString()+'</div><div class="l">Vehicles shown (of '+(showEq?DATA.length:DATA.length-EQN).toLocaleString()+')</div></div>'+
         '<div class="tile"><div class="n">'+inSvc.toLocaleString()+'</div><div class="l">In Service</div></div>'+
         '<div class="tile"><div class="n">'+out.toLocaleString()+'</div><div class="l">Out of Service</div></div>'+
         '<div class="tile"><div class="n">'+ret.toLocaleString()+'</div><div class="l">Retired, awaiting disposal</div></div>'+
@@ -320,6 +759,7 @@
         '<label>Division<select id="fv">'+opts(divs,f.division,'All divisions')+'</select></label>'+
         '<label>Status<select id="fs">'+opts(statuses,f.status,'All statuses')+'</select></label>'+
         '<label>Supervisor<select id="fu">'+opts(sups,f.supervisor,'All supervisors')+'</select></label>'+
+        '<label class="ck"><input type="checkbox" id="feq"'+(showEq?' checked':'')+'> Show fleet equipment and non-targeted ('+EQN+')</label>'+
         '<button class="btn" id="clr">Clear filters</button>'+
       '</div>'+
       '<div class="tablewrap">'+(filtered.length?
@@ -332,7 +772,9 @@
     document.getElementById('fv').onchange=function(){f.division=this.value;page=0;applyFilters();renderList()};
     document.getElementById('fs').onchange=function(){f.status=this.value;page=0;applyFilters();renderList()};
     document.getElementById('fu').onchange=function(){f.supervisor=this.value;page=0;applyFilters();renderList()};
-    document.getElementById('clr').onclick=function(){f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();renderList()};
+    document.getElementById('feq').onchange=function(){showEq=this.checked;page=0;applyFilters();renderList()};
+    var vpc=document.getElementById('vpc');if(vpc)vpc.onclick=function(){vpre=null;applyFilters();renderList()};
+    document.getElementById('clr').onclick=function(){vpre=null;showEq=false;f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();renderList()};
     document.getElementById('pp').onclick=function(){page--;renderList();window.scrollTo(0,0)};
     document.getElementById('pn').onclick=function(){page++;renderList();window.scrollTo(0,0)};
     Array.prototype.forEach.call(app.querySelectorAll('th[data-k]'),function(el){
@@ -343,7 +785,7 @@
     });
   }
 
-  function openAsset(id){tab='Overview';subtab='Services';location.hash=encodeURIComponent(id)}
+  function openAsset(id){tab='Overview';subtab='Services';mq='';cq='';location.hash=encodeURIComponent(id)}
 
   function fld(label,val,span){
     var has=val!==undefined&&val!==null&&String(val)!=='';
@@ -381,15 +823,30 @@
     Array.prototype.forEach.call(app.querySelectorAll('.tab[data-st]'),function(el){
       el.onclick=function(){subtab=el.getAttribute('data-st');renderDetail(v)}
     });
+    var mf=document.getElementById('mf'); if(mf)mf.oninput=function(){mq=mf.value;document.getElementById('mbody').innerHTML=mRows(v);bindWO()};
+    var cf=document.getElementById('cf'); if(cf)cf.oninput=function(){cq=cf.value;document.getElementById('cbody').innerHTML=cRows(v)};
+    bindWO();
     window.scrollTo(0,0);
   }
 
   q.addEventListener('input',function(){
+    if(curMode==='d'){query=q.value;page=0;applyFilters();location.hash='';return}
+    if(curMode==='w'){
+      wq=q.value;wpage=0;
+      if(location.hash.length>3){location.hash='wo'}else{renderWO()}
+      return;
+    }
     query=q.value;page=0;applyFilters();
     if(location.hash.length>1){location.hash=''}else{renderList()}
   });
   q.addEventListener('keydown',function(e){
     if(e.key!=='Enter')return;
+    if(curMode==='w'){
+      var t=q.value.trim();
+      if(WOIDX[t]){location.hash='wo/'+t;return}
+      if(WOLOADED&&wfiltered.length===1){location.hash='wo/'+wfiltered[0].n}
+      return;
+    }
     var ex=normAsset(q.value);
     if(ex){openAsset(ex);return}
     if(filtered.length===1){openAsset(filtered[0].asset)}
@@ -398,10 +855,29 @@
     if(e.key==='/'&&document.activeElement!==q&&!/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){e.preventDefault();q.focus();q.select()}
   });
   document.getElementById('brand').onclick=function(){location.hash=''};
+  document.getElementById('navv').onclick=function(){if(location.hash.length<2)render();else location.hash=''};
+  document.getElementById('navd').onclick=function(){location.hash='dash'};
+  var tip=document.createElement('div');tip.className='tip';document.body.appendChild(tip);
+  app.addEventListener('mouseover',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(t){tip.textContent=t.getAttribute('data-tip');tip.style.display='block'}else{tip.style.display='none'}});
+  app.addEventListener('mousemove',function(e){tip.style.left=Math.max(4,Math.min(e.clientX+14,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=(e.clientY+16)+'px'});
+  app.addEventListener('mouseleave',function(){tip.style.display='none'});
+  app.addEventListener('click',function(e){var g=e.target.closest&&e.target.closest('[data-go]');if(g){var fn=gos[+g.getAttribute('data-go')];if(fn){tip.style.display='none';fn()}}});
+  document.getElementById('navw').onclick=function(){location.hash='wo'};
   window.addEventListener('hashchange',render);
 
+  fetch('workorders.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
+    d.forEach(function(w){
+      var end=w.c?new Date(w.c).getTime():NOW;
+      w.days=Math.max(0,(end-new Date(w.d).getTime())/864e5);
+      w._h=norm([w.n,w.a,w.ad,w.x,w.cx,w.m,w.t,w.l,w.s,w.ss,w.cb,w.qb].join(' '));
+      WOIDX[w.n]=w;
+      if(w.a){(WOBY[w.a]=WOBY[w.a]||[]).push(w)}
+    });
+    WO=d;WOLOADED=true;
+    if(DATA.length)render();
+  }).catch(function(err){WOERR='The work order data did not load ('+err.message+'). Try reloading the page.';if(DATA.length)render()});
   fetch('vehicles.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
-    DATA=d;d.forEach(function(v){BY[v.asset]=v});
+    DATA=d;d.forEach(function(v){BY[v.asset]=v;if(isEq(v.asset)){v.category='Fleet Equipment';EQN++}});
     applyFilters();render();
   }).catch(function(err){
     app.innerHTML='<div class="empty">The vehicle data did not load ('+esc(err.message)+'). Try reloading the page.</div>';
