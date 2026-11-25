@@ -104,6 +104,8 @@
   .note{color:var(--muted);padding:6px 2px}
   .tabempty{background:var(--panel);border:1px dashed var(--line);border-radius:10px;padding:48px 20px;text-align:center;color:var(--muted)}
   .tabempty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+  .eqbox{display:flex;flex-direction:column;gap:3px;justify-content:flex-end;align-self:flex-end}
+  .filters .eqbox label.ck{padding-bottom:0;font-size:13px;line-height:1.25}
   .nav{display:flex;gap:4px}
   .nav button{background:transparent;border:0;color:#fff;opacity:.7;padding:8px 14px;border-radius:7px;font-weight:600}
   .nav button:hover{opacity:1;background:rgba(255,255,255,.1)}
@@ -183,9 +185,11 @@
   };
   var subtab='Services';
   var WO=[], WOIDX={}, WOBY={}, WOLOADED=false, WOERR='', curMode='v';
-  var wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false}, wq='', wsort={k:'d',dir:-1}, wpage=0, wfiltered=[], mq='', cq='';
-  var EQN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false;
+  var wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false,nt:false}, wq='', wsort={k:'d',dir:-1}, wpage=0, wfiltered=[], mq='', cq='';
+  var EQN=0, NTN=0, NOW=Date.now(), dper='12m', gos=[], vpre=null, showEq=false, showNT=false;
   function isEq(a){return !/^V\d+$/i.test(a||'')}
+  function isNT(a){return /^z(?!\d)/i.test(a||'')}
+  function hiddenAsset(a,fe,nt){return isEq(a)&&(isNT(a)?!nt:!fe)}
   function fmtD(iso){return iso?iso.slice(5,7)+'/'+iso.slice(8,10)+'/'+iso.slice(0,4):''}
   function fmtDT(iso){if(!iso)return '';var h=+iso.slice(11,13),ap=h>=12?'PM':'AM';h=h%12||12;return fmtD(iso)+' '+h+':'+iso.slice(14,16)+' '+ap}
   function fdays(d){return d==null?'':d.toFixed(1)}
@@ -371,7 +375,7 @@
       if(f.status&&v.status!==f.status)return false;
       if(f.supervisor&&v.supervisor!==f.supervisor)return false;
       if(vpre&&!vpre.fn(v))return false;
-      if(!showEq&&!toks.length&&isEq(v.asset))return false;
+      if(!toks.length&&hiddenAsset(v.asset,showEq,showNT))return false;
       if(!toks.length)return true;
       var hay=norm([v.asset,v.year,v.make,v.model,v.dept,v.division,v.status,v.plate,v.vin,v.category,v.type,v.classCode,v.contact,v.supervisor,v.glCode,v.comments].join(' '));
       return toks.every(function(t){return hay.indexOf(t)!==-1});
@@ -434,7 +438,7 @@
   function cm(n){n=Number(n)||0;var a=Math.abs(n);return a>=1e6?'$'+(n/1e6).toFixed(a>=1e7?1:2)+'M':a>=1e3?'$'+Math.round(n/1e3)+'K':'$'+Math.round(n)}
   function cnt(n){return Number(n).toLocaleString('en-US')}
   function reg(fn){gos.push(fn);return gos.length-1}
-  function goWO(label,fn,view){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort={k:'d',dir:-1};location.hash='wo'})}
+  function goWO(label,fn,view){return reg(function(){wf={view:view||'All',status:'',loc:'',tech:'',from:'',to:'',road:false,eq:false,nt:false,pre:{label:label,fn:fn}};wq='';wpage=0;wsort={k:'d',dir:-1};location.hash='wo'})}
   function goV(label,fn){return reg(function(){vpre={label:label,fn:fn};f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();location.hash=''})}
   function goAsset(a,t){return BY[a]?reg(function(){tab=t||'Maintenance';mq='';cq='';location.hash=encodeURIComponent(a)}):null}
   function vdesc(a){var v=BY[a];return v?[v.year,v.make,v.model].filter(Boolean).join(' '):''}
@@ -637,7 +641,7 @@
       if(wf.from&&w.d.slice(0,10)<wf.from)return false;
       if(wf.to&&w.d.slice(0,10)>wf.to)return false;
       if(wf.pre&&!wf.pre.fn(w))return false;
-      if(!wf.eq&&!toks.length&&isEq(w.a))return false;
+      if(!toks.length&&hiddenAsset(w.a,wf.eq,wf.nt))return false;
       for(var i=0;i<toks.length;i++){if(w._h.indexOf(toks[i])===-1)return false}
       return true;
     });
@@ -676,8 +680,8 @@
         '<label>Opened from<input type="date" id="wfr" value="'+esc(wf.from)+'"></label>'+
         '<label>Opened to<input type="date" id="wto" value="'+esc(wf.to)+'"></label>'+
         '<label class="ck"><input type="checkbox" id="wrc"'+(wf.road?' checked':'')+'> Road calls only</label>'+
-        '<label class="ck"><input type="checkbox" id="weq"'+(wf.eq?' checked':'')+'> Include fleet equipment and non-targeted</label>'+
         '<button class="btn" id="wclr">Clear filters</button>'+
+        '<div class="eqbox"><label class="ck"><input type="checkbox" id="weq"'+(wf.eq?' checked':'')+'> Fleet Equipment</label><label class="ck"><input type="checkbox" id="wnt"'+(wf.nt?' checked':'')+'> Non Targeted</label></div>'+
       '</div>'+
       '<div class="tablewrap">'+(wfiltered.length?
         '<table><thead><tr>'+th('n','WO #')+th('a','Vehicle')+'<th>Vehicle description</th>'+th('d','Opened')+th('c','Closed')+th('days','Days Down','num')+th('s','Status')+th('l','Shop')+th('t','Technician')+th('x','Description')+th('k','Total Cost','num')+'</tr></thead><tbody>'+rows+'</tbody></table>'
@@ -691,9 +695,10 @@
     on('wfr',function(){wf.from=this.value;wpage=0;renderWO()});
     on('wto',function(){wf.to=this.value;wpage=0;renderWO()});
     on('weq',function(){wf.eq=this.checked;wpage=0;renderWO()});
+    on('wnt',function(){wf.nt=this.checked;wpage=0;renderWO()});
     on('wrc',function(){wf.road=this.checked;wpage=0;renderWO()});
     var wpc=document.getElementById('wpc');if(wpc)wpc.onclick=function(){wf.pre=null;wpage=0;renderWO()};
-    document.getElementById('wclr').onclick=function(){wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false};wq='';q.value='';wpage=0;renderWO()};
+    document.getElementById('wclr').onclick=function(){wf={view:'Open',status:'',loc:'',tech:'',from:'',to:'',road:false,pre:null,eq:false,nt:false};wq='';q.value='';wpage=0;renderWO()};
     document.getElementById('wpp').onclick=function(){wpage--;renderWO();window.scrollTo(0,0)};
     document.getElementById('wpn').onclick=function(){wpage++;renderWO();window.scrollTo(0,0)};
     Array.prototype.forEach.call(app.querySelectorAll('button[data-view]'),function(el){
@@ -748,7 +753,7 @@
     app.innerHTML=
       (vpre?'<div class="prebar">Showing <b>'+esc(vpre.label)+'</b><button class="btn" id="vpc">Show all vehicles</button></div>':'')+
       '<div class="tiles">'+
-        '<div class="tile"><div class="n">'+filtered.length.toLocaleString()+'</div><div class="l">Vehicles shown (of '+(showEq?DATA.length:DATA.length-EQN).toLocaleString()+')</div></div>'+
+        '<div class="tile"><div class="n">'+filtered.length.toLocaleString()+'</div><div class="l">Vehicles shown (of '+(DATA.length-(showEq?0:EQN)-(showNT?0:NTN)).toLocaleString()+')</div></div>'+
         '<div class="tile"><div class="n">'+inSvc.toLocaleString()+'</div><div class="l">In Service</div></div>'+
         '<div class="tile"><div class="n">'+out.toLocaleString()+'</div><div class="l">Out of Service</div></div>'+
         '<div class="tile"><div class="n">'+ret.toLocaleString()+'</div><div class="l">Retired, awaiting disposal</div></div>'+
@@ -759,8 +764,8 @@
         '<label>Division<select id="fv">'+opts(divs,f.division,'All divisions')+'</select></label>'+
         '<label>Status<select id="fs">'+opts(statuses,f.status,'All statuses')+'</select></label>'+
         '<label>Supervisor<select id="fu">'+opts(sups,f.supervisor,'All supervisors')+'</select></label>'+
-        '<label class="ck"><input type="checkbox" id="feq"'+(showEq?' checked':'')+'> Show fleet equipment and non-targeted ('+EQN+')</label>'+
         '<button class="btn" id="clr">Clear filters</button>'+
+        '<div class="eqbox"><label class="ck"><input type="checkbox" id="feq"'+(showEq?' checked':'')+'> Fleet Equipment ('+EQN+')</label><label class="ck"><input type="checkbox" id="fnt"'+(showNT?' checked':'')+'> Non Targeted ('+NTN+')</label></div>'+
       '</div>'+
       '<div class="tablewrap">'+(filtered.length?
         '<table><thead><tr>'+th('asset','Vehicle No.')+th('year','Year')+th('make','Make')+th('model','Model')+th('dept','Department')+th('division','Division')+th('contact','Contact')+th('status','Status')+'</tr></thead><tbody>'+rows+'</tbody></table>'
@@ -773,8 +778,9 @@
     document.getElementById('fs').onchange=function(){f.status=this.value;page=0;applyFilters();renderList()};
     document.getElementById('fu').onchange=function(){f.supervisor=this.value;page=0;applyFilters();renderList()};
     document.getElementById('feq').onchange=function(){showEq=this.checked;page=0;applyFilters();renderList()};
+    document.getElementById('fnt').onchange=function(){showNT=this.checked;page=0;applyFilters();renderList()};
     var vpc=document.getElementById('vpc');if(vpc)vpc.onclick=function(){vpre=null;applyFilters();renderList()};
-    document.getElementById('clr').onclick=function(){vpre=null;showEq=false;f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();renderList()};
+    document.getElementById('clr').onclick=function(){vpre=null;showEq=false;showNT=false;f={dept:'',division:'',status:'',supervisor:''};query='';q.value='';page=0;applyFilters();renderList()};
     document.getElementById('pp').onclick=function(){page--;renderList();window.scrollTo(0,0)};
     document.getElementById('pn').onclick=function(){page++;renderList();window.scrollTo(0,0)};
     Array.prototype.forEach.call(app.querySelectorAll('th[data-k]'),function(el){
@@ -877,7 +883,7 @@
     if(DATA.length)render();
   }).catch(function(err){WOERR='The work order data did not load ('+err.message+'). Try reloading the page.';if(DATA.length)render()});
   fetch('vehicles.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){
-    DATA=d;d.forEach(function(v){BY[v.asset]=v;if(isEq(v.asset)){v.category='Fleet Equipment';EQN++}});
+    DATA=d;d.forEach(function(v){BY[v.asset]=v;if(isEq(v.asset)){if(isNT(v.asset)){v.category='Non Targeted';NTN++}else{v.category='Fleet Equipment';EQN++}}});
     applyFilters();render();
   }).catch(function(err){
     app.innerHTML='<div class="empty">The vehicle data did not load ('+esc(err.message)+'). Try reloading the page.</div>';
