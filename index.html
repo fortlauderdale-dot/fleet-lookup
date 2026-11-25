@@ -144,6 +144,11 @@
   .pa{position:relative}
   .gl{position:absolute;left:-46px;right:0;border-top:1px solid var(--line);height:0}
   .gl span{position:absolute;left:0;top:-8px;width:40px;text-align:right;font-size:11px;color:var(--muted);background:var(--panel)}
+  .pie{display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;flex:1;padding:4px 0}
+  .plg{display:flex;flex-direction:column;gap:2px;min-width:230px}
+  .plr{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;font-size:13px}.plr:hover{background:var(--accent-soft)}
+  .plr i{width:10px;height:10px;border-radius:3px;flex:none}.plr b{margin-left:auto;padding-left:20px;font-weight:600}
+  .pie path.clk:hover{opacity:.85}
   .avgl{position:absolute;left:0;right:0;height:0;border-top:2px dashed var(--ink);opacity:.55;pointer-events:none}
   .dcard{display:flex;flex-direction:column}.dcard .hb{flex:1;justify-content:space-around}.dcard .ch{flex:1;display:flex;flex-direction:column}.dcard .ch .pa{flex:1}
   .cr,.cl{display:grid}
@@ -471,6 +476,19 @@
       return '<div class="hr'+(i.go!=null?' clk':'')+'"'+(i.go!=null?' data-go="'+i.go+'"':'')+' data-tip="'+esc(i.vt+(i.t?'\n'+i.t.replace(i.l+': ',''):''))+'"><div class="hl">'+esc(i.l)+'</div><div class="ht"><div class="hf" style="width:'+w+'%;background:'+(i.c||'var(--s1)')+'"></div></div><div class="hv">'+esc(i.vt)+'</div></div>';
     }).join('')+'</div>';
   }
+  function pie(items,center){
+    var tot=items.reduce(function(a,i){return a+i.v},0),R=84,r=52,cx=90,cy=90,a0=-Math.PI/2,paths='';
+    function pt(rad,a){return (cx+rad*Math.cos(a)).toFixed(2)+' '+(cy+rad*Math.sin(a)).toFixed(2)}
+    items.forEach(function(i){
+      if(!i.v)return;var a1=a0+i.v/tot*Math.PI*2,big=(a1-a0)>Math.PI?1:0,d;
+      if(i.v>=tot)d='M'+pt(R,0)+' A'+R+' '+R+' 0 1 1 '+pt(R,Math.PI)+' A'+R+' '+R+' 0 1 1 '+pt(R,0)+' M'+pt(r,0)+' A'+r+' '+r+' 0 1 0 '+pt(r,Math.PI)+' A'+r+' '+r+' 0 1 0 '+pt(r,0)+' Z';
+      else d='M'+pt(R,a0)+' A'+R+' '+R+' 0 '+big+' 1 '+pt(R,a1)+' L'+pt(r,a1)+' A'+r+' '+r+' 0 '+big+' 0 '+pt(r,a0)+' Z';
+      paths+='<path d="'+d+'" fill="'+i.c+'" fill-rule="evenodd" stroke="var(--panel)" stroke-width="2"'+(i.go!=null?' class="clk" data-go="'+i.go+'"':'')+' data-tip="'+esc(i.vt)+'"></path>';
+      a0=a1;
+    });
+    var lg=items.map(function(i){return '<div class="plr'+(i.go!=null?' clk':'')+'"'+(i.go!=null?' data-go="'+i.go+'"':'')+' data-tip="'+esc(i.vt)+'"><i style="background:'+i.c+'"></i><span>'+esc(i.l)+'</span><b>'+esc(i.vt)+'</b></div>'}).join('');
+    return '<div class="pie"><svg viewBox="0 0 180 180" width="180" height="180" role="img">'+paths+'<text x="90" y="92" text-anchor="middle" font-size="26" font-weight="650" fill="var(--ink)">'+esc(center)+'</text></svg><div class="plg">'+lg+'</div></div>';
+  }
   function cols(cats,series,o){
     o=o||{};var fmt=o.fmt||cnt;
     var tot=cats.map(function(c,i){return series.reduce(function(a,s){return a+(s.v[i]||0)},0)});
@@ -576,7 +594,7 @@
 
     /* fleet */
     var stc={};DV.forEach(function(v){stc[v.status]=(stc[v.status]||0)+1});
-    var fstItems=Object.keys(stc).sort(function(a,b){return stc[b]-stc[a]}).map(function(k){return {l:k,v:stc[k],vt:cnt(stc[k]),c:k==='Out of Service'?'var(--crit)':'var(--s1)',go:goV('vehicles with status '+k,function(v){return v.status===k})}});
+    var fstItems=Object.keys(stc).sort(function(a,b){return stc[b]-stc[a]}).map(function(k){return {l:k,v:stc[k],vt:cnt(stc[k]),c:({'In Service':'var(--s1)','Out of Service':'var(--crit)','Retired- Awaiting Disposal':'var(--muted)','New Vehicle Prep':'var(--s3)','Awaiting Pickup':'var(--s4)'})[k]||'var(--s7)',go:goV('vehicles with status '+k,function(v){return v.status===k})}});
     var cat={};active.forEach(function(v){cat[v.category]=(cat[v.category]||0)+1});
     var catItems=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a]}).slice(0,10).map(function(k){return {l:k||'(none)',v:cat[k],vt:cnt(cat[k]),go:goV('active vehicles in '+(k||'(no category)'),function(v){return !/^Retired/.test(v.status)&&v.category===k})}});
     var yr=nowD.getFullYear(),ages=[],AB=[['0 to 2',0,2],['3 to 5',3,5],['6 to 8',6,8],['9 to 11',9,11],['12 to 14',12,14],['15+',15,99]],ab=AB.map(function(){return 0}),asum=0,an=0;
@@ -651,7 +669,7 @@
       '</div>'+
       '<div class="dsec">The Fleet</div>'+
       '<div class="dgrid">'+
-        card('Vehicles by status','',hbars(fstItems))+
+        card('Vehicles by status','',pie(fstItems,cnt(DV.length)))+
         card('Replacement outlook','',
           '<div class="mini"><div class="clk" data-go="'+ovGo+'"><b>'+cm(ov.c)+'</b><span>Overdue now ('+cnt(ov.n)+' vehicles)</span></div><div><b>'+cm(nx.c)+'</b><span>Due in the next 12 months ('+cnt(nx.n)+')</span></div><div><b>'+cm(esc$)+'</b><span>Annual escrow set aside</span></div></div>'+
           cols(ycats,[{n:'Overdue',c:'var(--crit)',v:yo},{n:'Projected',c:'var(--s1)',v:ys}],{fmt:cm,plain:true}))+
