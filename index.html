@@ -123,7 +123,7 @@
   :root{--s1:#257de0;--s2:#f47230;--s3:#00b894;--s4:#f2a600;--s5:#ee7fac;--s6:#008a17;--s7:#6a4ce2;--s8:#ec4647;--good:#0aac23;--warn:#fbb315;--serious:#f18a59;--crit:#dc3c3d;--track:#eef1f4}
   @media (prefers-color-scheme: dark){:root{--s1:#338ced;--s2:#e76624;--s3:#00a888;--s4:#d28e05;--s5:#e24d8b;--s6:#0aac23;--s7:#9887ef;--s8:#eb6263;--track:#223140}}
   .dhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}.dhead h1{margin:0;font-size:20px}.dhead .note{margin-left:auto;padding:0}
-  .dsec{margin:18px 0 8px;font-size:12px;font-weight:650;color:var(--muted);letter-spacing:.04em}
+  .dsec{margin:18px 0 8px;font-size:14px;font-weight:650;color:var(--muted)}
   .dtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
   .dt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
   .dt .dn{font-size:26px;font-weight:650;line-height:1.1}.dt .dl{font-size:12px;color:var(--ink);margin-top:2px}.dt .ds{font-size:11px;color:var(--muted)}
@@ -590,8 +590,8 @@
     var sel='<select id="dper">'+Object.keys(PERS).map(function(k){return '<option value="'+k+'"'+(k===dper?' selected':'')+'>'+PERS[k][0]+'</option>'}).join('')+'</select>';
     app.innerHTML=
       '<div class="dhead"><h1>Dashboard</h1><label class="tog">Period '+sel+'</label><span class="note">Click any number or bar to see the work orders or vehicles behind it.</span></div>'+
-      '<div class="dsec">RIGHT NOW</div><div class="dtiles">'+now+'</div>'+
-      '<div class="dsec">'+esc(perName.toUpperCase())+'</div><div class="dtiles">'+pt+'</div>'+
+      '<div class="dsec">Right Now</div><div class="dtiles">'+now+'</div>'+
+      '<div class="dsec">'+esc(perName)+'</div><div class="dtiles">'+pt+'</div>'+
       '<div class="dgrid">'+
         card('Open work orders by status','Click a status to open the list',hbars(stItems))+
         card('How long open work orders have been open','Days since opened',hbars(agItems))+
@@ -605,7 +605,7 @@
         card('Maintenance cost by department',perName,hbars(depItems))+
         card('Maintenance cost per active vehicle','Departments with 10 or more vehicles. '+perName,hbars(depPV))+
       '</div>'+
-      '<div class="dsec">THE FLEET</div>'+
+      '<div class="dsec">The Fleet</div>'+
       '<div class="dgrid">'+
         card('Vehicles by status','All '+cnt(DV.length)+' assets',hbars(fstItems))+
         card('Age of active vehicles','Average '+(an?(asum/an).toFixed(1):'')+' years by model year',cols(AB.map(function(b){return {l:b[0],t:b[0]+' years old'}}),[{n:'Vehicles',c:'var(--s1)',v:ab}],{go:ageGo}))+
